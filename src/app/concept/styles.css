@@ -1,0 +1,38 @@
+.iXsSFr {
+  position: relative;
+  background-color: var(--black);
+  height: 100%;
+  display: grid;
+  grid-template:
+    "company product socials sign-up" 219px
+    "request-demo request-demo request-demo request-demo" 94px
+    "copyright copyright copyright copyright" 74px /
+    258.33px 226.33px 226.33px 521px;
+  gap: 0px 32px;
+  color: white;
+  padding: 32px;
+  overflow: hidden;
+}
+
+.company {
+  grid-area: company;
+}
+.product {
+  grid-area: product;
+}
+.socials {
+  grid-area: socials;
+}
+.sign-up {
+  grid-area: sign-up;
+}
+.request-demo {
+  grid-area: request-demo;
+  display: flex;
+  align-items: center;
+}
+.copyright {
+  grid-area: copyright;
+  display: flex;
+  align-items: center;
+}
