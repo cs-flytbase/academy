@@ -336,7 +336,7 @@ const Layout = ({ children }: LayoutProps) => {
         { name: "Courses", href: "/course" },
         { name: "Tutorials", href: "/tutorials" },
         { name: "Docs", href: "https://docs.flytbase.com/" },
-        { name: "Blog", href: "https://www.flytbase.com/blog" },
+        { name: "Blogs", href: "https://www.flytbase.com/blog", external: true },
       ],
     },
     {
@@ -593,42 +593,45 @@ const Layout = ({ children }: LayoutProps) => {
       <footer className="bg-muted/30 border-t border-border">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Footer main content */}
-          <div className="py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="py-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Company info */}
             <div>
               <img
                 src={getLogo()}
                 alt="Flytbase Academy"
-                className="h-10 xs:h-9 sm:h-10 md:h-10 w-auto mb-4 max-w-[160px] sm:max-w-[160px]"
+                className="h-12 xs:h-10 sm:h-12 md:h-12 w-auto mb-5 max-w-[180px] sm:max-w-[180px]"
               />
-              <p className="text-sm text-muted-foreground mb-4">
+              <p className="text-sm text-muted-foreground mb-5">
                 Empowering learners worldwide with cutting-edge drone technology
                 education and professional training programs.
               </p>
-              <div className="flex space-x-4">
+              <div className="flex flex-col space-y-3 mb-4">
                 <a
-                  href="#"
-                  className="text-muted-foreground hover:text-primary transition-colors"
+                  href="mailto:support@flytbase.com"
+                  className="text-sm flex items-center text-muted-foreground hover:text-primary transition-colors"
                 >
-                  <Facebook className="h-5 w-5" />
+                  <Mail className="h-4 w-4 mr-2" />
+                  <span>support@flytbase.com</span>
                 </a>
+              </div>
+              <div className="flex space-x-5">
                 <a
-                  href="#"
+                  href="https://www.linkedin.com/company/flytbase"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <Twitter className="h-5 w-5" />
-                </a>
-                <a
-                  href="#"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <Instagram className="h-5 w-5" />
-                </a>
-                <a
-                  href="#"
-                  className="text-muted-foreground hover:text-primary transition-colors"
+                  aria-label="LinkedIn"
                 >
                   <Linkedin className="h-5 w-5" />
+                </a>
+                <a
+                  href="https://www.instagram.com/flytbase"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                  aria-label="Instagram"
+                >
+                  <Instagram className="h-5 w-5" />
                 </a>
               </div>
             </div>
@@ -639,15 +642,26 @@ const Layout = ({ children }: LayoutProps) => {
                 <h3 className="text-sm font-semibold text-foreground mb-4">
                   {column.title}
                 </h3>
-                <ul className="space-y-2">
+                <ul className="space-y-3">
                   {column.links.map((link) => (
                     <li key={link.name}>
-                      <Link
-                        href={link.href}
-                        className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                      >
-                        {link.name}
-                      </Link>
+                      {link.external ? (
+                        <a
+                          href={link.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          {link.name}
+                        </a>
+                      ) : (
+                        <Link
+                          href={link.href}
+                          className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          {link.name}
+                        </Link>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -656,7 +670,7 @@ const Layout = ({ children }: LayoutProps) => {
           </div>
 
           {/* Bottom bar */}
-          <div className="border-t border-border py-6 flex flex-col md:flex-row justify-between items-center">
+          <div className="border-t border-border py-7 flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm text-muted-foreground">
               © {new Date().getFullYear()} Flytbase Academy. All rights
               reserved.
@@ -664,19 +678,19 @@ const Layout = ({ children }: LayoutProps) => {
 
             <div className="flex mt-4 md:mt-0 space-x-6">
               <a
-                href="#"
+                href="/privacy"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 Privacy Policy
               </a>
               <a
-                href="#"
+                href="/terms"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 Terms of Service
               </a>
               <a
-                href="#"
+                href="/cookies"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 Cookie Policy
