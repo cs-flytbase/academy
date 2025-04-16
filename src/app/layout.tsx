@@ -25,7 +25,7 @@ export default function RootLayout({
         <TestProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="light"
+            defaultTheme="dark"
             enableSystem={false}
             disableTransitionOnChange
           >
