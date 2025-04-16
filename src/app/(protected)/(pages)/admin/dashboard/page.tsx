@@ -2119,7 +2119,7 @@ export default function AdminDashboard() {
               {saveLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Deleting...
+                  Deleting..
                 </>
               ) : (
                 <>
