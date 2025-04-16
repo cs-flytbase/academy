@@ -49,6 +49,9 @@ import {
   CheckCircle,
   Loader2,
   List,
+  ListChecks,
+  Clock,
+  FileText,
 } from "lucide-react";
 import {
   Dialog,
@@ -145,6 +148,33 @@ interface QuestionForm {
   }[];
 }
 
+interface Assessment {
+  id: string;
+  title: string;
+  description: string;
+  thumbnail?: string;
+  time_limit: number;
+  difficulty?: string;
+  category?: string;
+  course_id?: string;
+  created_at: string;
+  passing_percentage?: number;
+  number_of_questions?: number;
+  courses?: string[];
+  prompt?: string;
+}
+
+interface AssessmentForm {
+  id?: string;
+  name: string;
+  description: string;
+  time: number;
+  number_of_questions: number;
+  courses: string[];
+  prompt: string;
+  passing_percentage?: number;
+}
+
 export default function AdminDashboard() {
   // Initialize Supabase client
   const supabase = createClient();
@@ -162,6 +192,26 @@ export default function AdminDashboard() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [videos, setVideos] = useState<Video[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [assessments, setAssessments] = useState<Assessment[]>([]);
+  const [loadingAssessments, setLoadingAssessments] = useState(false);
+
+  // State for assessment creation/editing
+  const [showAssessmentDialog, setShowAssessmentDialog] = useState(false);
+  const [assessmentForm, setAssessmentForm] = useState<AssessmentForm>({
+    name: "",
+    description: "",
+    time: 60,
+    number_of_questions: 20,
+    courses: [],
+    prompt: "must create 20 question no matter what",
+    passing_percentage: 70,
+  });
+  const [isCreatingAssessment, setIsCreatingAssessment] = useState(false);
+  const [isEditingAssessment, setIsEditingAssessment] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [assessmentToDelete, setAssessmentToDelete] = useState<string | null>(
+    null
+  );
 
   // State for selection
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
@@ -249,7 +299,33 @@ export default function AdminDashboard() {
     setSelectedCourse(null);
     setSelectedVideo(null);
     setQuestions([]);
+
+    if (activeTab === "assessments") {
+      fetchAssessments();
+    }
   }, [activeTab]);
+
+  // Fetch assessments
+  const fetchAssessments = async () => {
+    setLoadingAssessments(true);
+    try {
+      const { data, error } = await supabase
+        .from("assessments")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        throw error;
+      }
+
+      setAssessments(data || []);
+    } catch (error) {
+      console.error("Error fetching assessments:", error);
+      toast.error("Failed to fetch assessments");
+    } finally {
+      setLoadingAssessments(false);
+    }
+  };
 
   // Fetch courses
   const fetchCourses = async () => {
@@ -720,6 +796,177 @@ export default function AdminDashboard() {
     }
   };
 
+  // Create or update an assessment
+  const createOrUpdateAssessment = async () => {
+    // Validate form data
+    if (!assessmentForm.name.trim()) {
+      toast.error("Assessment name is required");
+      return;
+    }
+
+    if (!assessmentForm.description.trim()) {
+      toast.error("Assessment description is required");
+      return;
+    }
+
+    if (assessmentForm.courses.length === 0) {
+      toast.error("Please select at least one course");
+      return;
+    }
+
+    setIsCreatingAssessment(true);
+
+    try {
+      if (isEditingAssessment && assessmentForm.id) {
+        // Update existing assessment
+        const { error } = await supabase
+          .from("assessments")
+          .update({
+            title: assessmentForm.name,
+            description: assessmentForm.description,
+            time_limit: assessmentForm.time,
+            passing_percentage: assessmentForm.passing_percentage,
+            // We can't change number_of_questions on existing assessments
+            // as questions would have already been generated
+          })
+          .eq("id", assessmentForm.id);
+
+        if (error) throw error;
+
+        toast.success("Assessment updated successfully!");
+        fetchAssessments();
+      } else {
+        // Create new assessment via webhook
+        // Prepare the data for the webhook
+        const requestData = {
+          courses: assessmentForm.courses,
+          name: assessmentForm.name,
+          number_of_questions: assessmentForm.number_of_questions,
+          description: assessmentForm.description,
+          time: assessmentForm.time,
+          prompt: assessmentForm.prompt,
+          passing_percentage: assessmentForm.passing_percentage,
+        };
+
+        // Send the request to the webhook endpoint
+        const response = await fetch(
+          "https://srv-roxra.app.n8n.cloud/webhook/ae07cfdc-a2c1-4a09-8cfc-ac4c2183c64f",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestData),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+
+        toast.success("Assessment creation request submitted successfully!");
+
+        // Refresh the assessments list after a short delay to allow for creation
+        setTimeout(() => {
+          fetchAssessments();
+        }, 2000);
+      }
+
+      setShowAssessmentDialog(false);
+
+      // Reset the form
+      setAssessmentForm({
+        name: "",
+        description: "",
+        time: 60,
+        number_of_questions: 20,
+        courses: [],
+        prompt: "must create 20 question no matter what",
+        passing_percentage: 70,
+      });
+      setIsEditingAssessment(false);
+    } catch (error) {
+      console.error("Error creating/updating assessment:", error);
+      toast.error(
+        isEditingAssessment
+          ? "Failed to update assessment"
+          : "Failed to create assessment"
+      );
+    } finally {
+      setIsCreatingAssessment(false);
+    }
+  };
+
+  // Edit an assessment
+  const handleEditAssessment = (assessment: Assessment) => {
+    setIsEditingAssessment(true);
+    setAssessmentForm({
+      id: assessment.id,
+      name: assessment.title,
+      description: assessment.description,
+      time: assessment.time_limit,
+      number_of_questions: assessment.number_of_questions || 20,
+      courses: assessment.courses || [],
+      prompt: assessment.prompt || "must create 20 question no matter what",
+      passing_percentage: assessment.passing_percentage || 70,
+    });
+    setShowAssessmentDialog(true);
+  };
+
+  // Delete an assessment
+  const deleteAssessment = async () => {
+    if (!assessmentToDelete) return;
+
+    setSaveLoading(true);
+    try {
+      // First, delete associated questions
+      const { data: questionsData, error: questionsError } = await supabase
+        .from("questions")
+        .select("id")
+        .eq("assessment_id", assessmentToDelete);
+
+      if (questionsError) throw questionsError;
+
+      if (questionsData && questionsData.length > 0) {
+        const questionIds = questionsData.map((q) => q.id);
+
+        // Delete question options
+        const { error: optionsError } = await supabase
+          .from("question_options")
+          .delete()
+          .in("question_id", questionIds);
+
+        if (optionsError) throw optionsError;
+
+        // Delete the questions
+        const { error: deleteQuestionsError } = await supabase
+          .from("questions")
+          .delete()
+          .in("id", questionIds);
+
+        if (deleteQuestionsError) throw deleteQuestionsError;
+      }
+
+      // Finally, delete the assessment
+      const { error: deleteAssessmentError } = await supabase
+        .from("assessments")
+        .delete()
+        .eq("id", assessmentToDelete);
+
+      if (deleteAssessmentError) throw deleteAssessmentError;
+
+      toast.success("Assessment deleted successfully");
+      fetchAssessments();
+    } catch (error) {
+      console.error("Error deleting assessment:", error);
+      toast.error("Failed to delete assessment");
+    } finally {
+      setSaveLoading(false);
+      setShowDeleteConfirm(false);
+      setAssessmentToDelete(null);
+    }
+  };
+
   // Delete a question
   const deleteQuestion = async (questionId: number) => {
     if (
@@ -787,6 +1034,9 @@ export default function AdminDashboard() {
           </TabsTrigger>
           <TabsTrigger value="create-course" className="text-base py-2 px-3">
             <PlusCircle className="mr-2 h-4 w-4" /> Create Course
+          </TabsTrigger>
+          <TabsTrigger value="assessments" className="text-base py-2 px-3">
+            <ListChecks className="mr-2 h-4 w-4" /> Assessments
           </TabsTrigger>
           <TabsTrigger value="users" className="text-base py-2 px-3">
             <Users className="mr-2 h-4 w-4" /> User Management
@@ -1125,6 +1375,128 @@ export default function AdminDashboard() {
         </TabsContent>
 
         {/* User Management Tab */}
+        {/* Assessments Tab */}
+        <TabsContent value="assessments">
+          <Card>
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <ListChecks className="mr-2 h-5 w-5" />
+                  Assessment Management
+                </div>
+                <Button
+                  onClick={() => {
+                    setIsEditingAssessment(false);
+                    setAssessmentForm({
+                      name: "",
+                      description: "",
+                      time: 60,
+                      number_of_questions: 20,
+                      courses: [],
+                      prompt: "must create 20 question no matter what",
+                      passing_percentage: 70,
+                    });
+                    setShowAssessmentDialog(true);
+                  }}
+                >
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Create Assessment
+                </Button>
+              </CardTitle>
+              <CardDescription>
+                Create and manage AI-generated assessments for courses
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="px-0">
+              {loadingAssessments ? (
+                <div className="flex justify-center items-center py-8">
+                  <RefreshCw className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : assessments.length === 0 ? (
+                <div className="bg-muted/40 rounded-lg border border-border p-8 text-center mx-6">
+                  <ListChecks className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <h3 className="text-xl font-medium mb-2">
+                    Create AI Assessments
+                  </h3>
+                  <p className="text-muted-foreground text-sm max-w-md mx-auto mb-6">
+                    Use AI to generate comprehensive assessments based on course
+                    content. Select courses, set parameters, and the system will
+                    create tailored questions.
+                  </p>
+                  <Button onClick={() => setShowAssessmentDialog(true)}>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Create New Assessment
+                  </Button>
+                </div>
+              ) : (
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Title</TableHead>
+                        <TableHead>Time Limit</TableHead>
+                        <TableHead>Questions</TableHead>
+                        <TableHead>Passing %</TableHead>
+                        <TableHead>Created</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {assessments.map((assessment) => {
+                        // Get question count
+                        const questionCount =
+                          assessment.number_of_questions || "—";
+
+                        return (
+                          <TableRow key={assessment.id}>
+                            <TableCell className="font-medium">
+                              {assessment.title}
+                            </TableCell>
+                            <TableCell>{assessment.time_limit} mins</TableCell>
+                            <TableCell>{questionCount}</TableCell>
+                            <TableCell>
+                              {assessment.passing_percentage || 70}%
+                            </TableCell>
+                            <TableCell>
+                              {new Date(
+                                assessment.created_at
+                              ).toLocaleDateString()}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() =>
+                                    handleEditAssessment(assessment)
+                                  }
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="text-destructive hover:text-destructive"
+                                  onClick={() => {
+                                    setAssessmentToDelete(assessment.id);
+                                    setShowDeleteConfirm(true);
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="users">
           <Card>
             <CardHeader className="pb-4">
@@ -1481,6 +1853,278 @@ export default function AdminDashboard() {
                 <>
                   <Save className="mr-2 h-4 w-4" />
                   {isEditing ? "Update Question" : "Add Question"}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Assessment Creation/Editing Dialog */}
+      <Dialog
+        open={showAssessmentDialog}
+        onOpenChange={setShowAssessmentDialog}
+      >
+        <DialogContent className="w-[95vw] max-w-[600px] max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader className="pb-2">
+            <DialogTitle>
+              {isEditingAssessment
+                ? "Edit Assessment"
+                : "Create AI-Generated Assessment"}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="py-3 space-y-4 overflow-y-auto pr-2 flex-1">
+            {/* Assessment Name */}
+            <div className="space-y-2">
+              <Label htmlFor="assessment_name">Assessment Name</Label>
+              <Input
+                id="assessment_name"
+                value={assessmentForm.name}
+                onChange={(e) =>
+                  setAssessmentForm({
+                    ...assessmentForm,
+                    name: e.target.value,
+                  })
+                }
+                placeholder="e.g., Drone Flight Operations Certificate"
+              />
+            </div>
+
+            {/* Assessment Description */}
+            <div className="space-y-2">
+              <Label htmlFor="assessment_description">Description</Label>
+              <Textarea
+                id="assessment_description"
+                value={assessmentForm.description}
+                onChange={(e) =>
+                  setAssessmentForm({
+                    ...assessmentForm,
+                    description: e.target.value,
+                  })
+                }
+                placeholder="Describe what this assessment will test"
+                className="min-h-[80px]"
+              />
+            </div>
+
+            {/* Course Selection - only for new assessments */}
+            {!isEditingAssessment && (
+              <div className="space-y-2">
+                <Label>Select Courses</Label>
+                <div className="border rounded-md p-3 max-h-[150px] overflow-y-auto space-y-2">
+                  {courses.length === 0 ? (
+                    <div className="text-sm text-muted-foreground text-center py-2">
+                      No courses available
+                    </div>
+                  ) : (
+                    courses.map((course) => (
+                      <div
+                        key={course.id}
+                        className="flex items-center space-x-2"
+                      >
+                        <Checkbox
+                          id={`course-${course.id}`}
+                          checked={assessmentForm.courses.includes(course.id)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setAssessmentForm({
+                                ...assessmentForm,
+                                courses: [...assessmentForm.courses, course.id],
+                              });
+                            } else {
+                              setAssessmentForm({
+                                ...assessmentForm,
+                                courses: assessmentForm.courses.filter(
+                                  (id) => id !== course.id
+                                ),
+                              });
+                            }
+                          }}
+                        />
+                        <Label
+                          htmlFor={`course-${course.id}`}
+                          className="cursor-pointer"
+                        >
+                          {course.title}
+                        </Label>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Time Limit */}
+            <div className="space-y-2">
+              <Label htmlFor="time_limit">Time Limit (minutes)</Label>
+              <Input
+                id="time_limit"
+                type="number"
+                min="10"
+                max="180"
+                value={assessmentForm.time}
+                onChange={(e) =>
+                  setAssessmentForm({
+                    ...assessmentForm,
+                    time: parseInt(e.target.value),
+                  })
+                }
+              />
+            </div>
+
+            {/* Passing Percentage */}
+            <div className="space-y-2">
+              <Label htmlFor="passing_percentage">Passing Percentage</Label>
+              <Input
+                id="passing_percentage"
+                type="number"
+                min="50"
+                max="100"
+                value={assessmentForm.passing_percentage}
+                onChange={(e) =>
+                  setAssessmentForm({
+                    ...assessmentForm,
+                    passing_percentage: parseInt(e.target.value),
+                  })
+                }
+              />
+            </div>
+
+            {/* Number of Questions - only for new assessments */}
+            {!isEditingAssessment && (
+              <div className="space-y-2">
+                <Label htmlFor="question_count">Number of Questions</Label>
+                <Input
+                  id="question_count"
+                  type="number"
+                  min="5"
+                  max="50"
+                  value={assessmentForm.number_of_questions}
+                  onChange={(e) =>
+                    setAssessmentForm({
+                      ...assessmentForm,
+                      number_of_questions: parseInt(e.target.value),
+                    })
+                  }
+                />
+              </div>
+            )}
+
+            {/* AI Prompt (Optional) - only for new assessments */}
+            {!isEditingAssessment && (
+              <div className="space-y-2">
+                <Label htmlFor="ai_prompt" className="flex justify-between">
+                  <span>AI Prompt (Optional)</span>
+                  <span className="text-xs text-muted-foreground">
+                    Additional instructions for AI
+                  </span>
+                </Label>
+                <Textarea
+                  id="ai_prompt"
+                  value={assessmentForm.prompt}
+                  onChange={(e) =>
+                    setAssessmentForm({
+                      ...assessmentForm,
+                      prompt: e.target.value,
+                    })
+                  }
+                  placeholder="Additional instructions for the AI"
+                  className="min-h-[80px]"
+                />
+              </div>
+            )}
+
+            {/* Note about editing limitations */}
+            {isEditingAssessment && (
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Note</AlertTitle>
+                <AlertDescription>
+                  Some fields cannot be changed after an assessment is created,
+                  including the courses, number of questions, and AI prompt, as
+                  these would require regenerating the questions.
+                </AlertDescription>
+              </Alert>
+            )}
+          </div>
+
+          <DialogFooter className="border-t pt-4 mt-4">
+            {!isEditingAssessment && (
+              <div className="flex items-center text-sm text-muted-foreground mr-auto">
+                <Clock className="mr-1 h-4 w-4" />
+                <span>This may take a few minutes to generate</span>
+              </div>
+            )}
+            <Button
+              variant="outline"
+              onClick={() => setShowAssessmentDialog(false)}
+              disabled={isCreatingAssessment}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={createOrUpdateAssessment}
+              disabled={
+                isCreatingAssessment ||
+                !assessmentForm.name.trim() ||
+                !assessmentForm.description.trim() ||
+                (!isEditingAssessment && assessmentForm.courses.length === 0)
+              }
+            >
+              {isCreatingAssessment ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {isEditingAssessment ? "Updating..." : "Creating..."}
+                </>
+              ) : (
+                <>
+                  <FileText className="mr-2 h-4 w-4" />
+                  {isEditingAssessment
+                    ? "Update Assessment"
+                    : "Create Assessment"}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <DialogContent className="max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Delete Assessment</DialogTitle>
+          </DialogHeader>
+          <div className="py-3">
+            <p className="text-sm text-muted-foreground">
+              Are you sure you want to delete this assessment? This action will
+              also remove all questions and options associated with this
+              assessment. This cannot be undone.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteConfirm(false)}
+              disabled={saveLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={deleteAssessment}
+              disabled={saveLoading}
+            >
+              {saveLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete Assessment
                 </>
               )}
             </Button>
