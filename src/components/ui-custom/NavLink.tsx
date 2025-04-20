@@ -55,7 +55,7 @@ const NavLink = ({
             }}
           >
             <div className="absolute left-[-9px]">
-              <NavArrow />
+              {/* <NavArrow /> */}
             </div>
             <span>{children}</span>
           </motion.div>

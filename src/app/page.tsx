@@ -165,7 +165,7 @@ const VideoLandingPage = () => {
             <div className="relative rounded-2xl overflow-hidden shadow-xl border border-gray-100/10">
               {/* Overlay with headline text */}
               <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/40 px-4">
-                <div className="text-center max-w-5xl pt-32">
+                <div className="text-center max-w-5xl pt-80">
                   <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
                     You know what you want to accomplish.{" "}
                     <span className="text-yellow-400">Now learn how.</span>
@@ -185,12 +185,12 @@ const VideoLandingPage = () => {
                     >
                       <Button
                         size="lg"
-                        className="bg-[#171717]  text-white rounded-full px-8 relative z-10 overflow-hidden"
+                        className="bg-white  text-white rounded-full px-8 relative z-10 overflow-hidden"
                         asChild
                       >
                         <motion.div className="group">
                           <div className="flex items-center relative z-10">
-                            <span className="mr-2 relative z-10 text-white group-hover:text-black transition-colors duration-300">
+                            <span className="mr-2 relative z-10 text-black group-hover:text-black transition-colors duration-300">
                               Start Learning
                             </span>
                             <motion.span
@@ -201,7 +201,7 @@ const VideoLandingPage = () => {
                                 duration: 1,
                                 ease: "easeInOut"
                               }}
-                              className="relative z-10 text-white group-hover:text-black transition-colors duration-300"
+                              className="relative z-10 text-black group-hover:text-black transition-colors duration-300"
                             >
                               <ArrowRight className="h-4 w-4" />
                             </motion.span>

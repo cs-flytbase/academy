@@ -397,9 +397,9 @@ const Layout = ({ children }: LayoutProps) => {
     checkAdminStatus();
   }, []);
   return (
-    <div className="min-h-screen flex flex-col ">
+    <div className="min-h-screen flex flex-col mx-auto">
       <nav
-        className={`w-full sticky top-0 z-50 transition-all duration-200  ${
+        className={`w-full sticky top-0 z-50 transition-all duration-200 md:px-10 ${
           isScrolled
             ? "bg-card/90 backdrop-blur-md shadow-md"
             : "bg-card shadow-sm"
@@ -420,22 +420,17 @@ const Layout = ({ children }: LayoutProps) => {
 
             <div className="hidden md:flex items-center space-x-6 ">
               {/* Desktop navigation */}
-              <div className="flex items-center space-x-5 ">
-                <NavLink href="/assignment">
-                  <span className="text-sm md:text-base font-normal">Certifications</span>
-                </NavLink>
-                <NavLink href="/course">
-                  <span className="text-sm md:text-base font-normal">Courses</span>
-                </NavLink>
+              <div className="flex items-center space-x-8 ">
                 
                 {/* Resources Dropdown */}
-                <div className="relative group mx-2">
-                  <div className="flex items-center cursor-pointer">
-                    <span className="text-sm md:text-sm font-normal">RESOURCES</span>
+                <div className="relative group mx-5">
+                  <div className="flex items-center cursor-pointer ">
+                    <span className="text-sm md:text-sm font-normal">Resources</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1 transition-transform duration-200 group-hover:-rotate-180">
                       <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
                   </div>
+
                   
                   {/* Dropdown Menu */}
                   <div className="absolute left-0 mt-2 w-48 bg-card rounded shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 border border-border">
@@ -455,6 +450,12 @@ const Layout = ({ children }: LayoutProps) => {
                     </div>
                   </div>
                 </div>
+                <Link href="/assignment">
+                  <span className="text-sm md:text-sm font-normal">Certifications</span>
+                </Link>
+                <Link href="/course">
+                  <span className="text-sm md:text-sm font-normal">Courses</span>
+                </Link>
               </div>
               <div className="h-8 w-px bg-border/70"></div>
               <UserGreetText />
