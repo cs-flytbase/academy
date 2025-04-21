@@ -66,7 +66,7 @@ export function CourseCard({
       onMouseMove={handleMouseMove}
     >
       {/* BORDER with gradient from top to bottom */}
-      <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-[#000000] via-[#171d46] to-[#1A6ED0] p-[1.5px]">
+      <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-[#000000] via-[#1A6ED0] to-[#1A6ED0] p-[1.5px]">
         {/* INNER CARD */}
         <Card className="h-full rounded-3xl overflow-hidden bg-gradient-to-b from-[#14171b] to-[#1a1e24] border-0 p-0 flex flex-col ">
           {/* INTERACTIVE GLOW EFFECT */}
@@ -99,7 +99,7 @@ export function CourseCard({
             )} />
             
             {/* Stats on top of the thumbnail */}
-            <div className="absolute bottom-4 left-4 flex items-center justify-between gap-3 z-20 w-full pr-7">
+            <div className="absolute bottom-4 left-4 flex items-center justify-between gap-3 z-20 w-full px-3 pr-10">
               <div className="flex items-center gap-0">
               <span className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/10">
                 <Video className="h-3.5 w-3.5 text-[#3a8dff]" /> 

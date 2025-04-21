@@ -88,7 +88,7 @@ export function CertificateAssessmentCard({
     >
       {/* SIMPLE BLUE BORDER */}
       <div 
-        className="absolute inset-0 rounded-3xl bg-[#3a8dff] p-[1.5px]"
+        className="absolute inset-0 rounded-3xl bg-gradient-to-b from-[#000000] via-[#1A6ED0] to-[#1A6ED0] p-[1.5px]"
       >
         
         {/* INNER CARD */}
@@ -105,7 +105,7 @@ export function CertificateAssessmentCard({
           />
           
           {/* DECORATIVE TOP BAR */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#2C7BF2] to-transparent" />
+          {/* <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#2C7BF2] to-transparent" /> */}
           
           <CardContent className="p-8 space-y-8 relative h-full flex flex-col justify-between">
             {/* TOP SECTION */}

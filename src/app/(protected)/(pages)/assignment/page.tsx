@@ -101,7 +101,7 @@ const Index = () => {
       </div>
       {/* Certificates Grid */}
       <div className="mx-auto px-2 md:px-20 pb-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-2 mt-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 mt-10">
           {filteredAssignments.map((assignment) => (
             <div key={assignment.id} className="animate-fade-in w-full ">
               <CertificateAssessmentCard
