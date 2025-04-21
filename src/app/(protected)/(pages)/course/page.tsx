@@ -15,6 +15,9 @@ import { createClient } from "@/utils/supabase/client";
 import { Heart, BookOpen, Clock, Video, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import CourseCard from "@/components/ui/course-card";
+import { Input } from "@/components/ui/input";
+import { Filter } from "lucide-react";
 
 interface Course {
   id: number;
@@ -37,6 +40,7 @@ const UserPage = () => {
   const [user, setUser] = useState<User | null>(null);
   const [enrolledCourses, setEnrolledCourses] = useState<number[]>([]);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const supabase = createClient();
 
   useEffect(() => {
@@ -249,6 +253,10 @@ const UserPage = () => {
     window.location.href = `/course/${courseId}`;
   };
 
+  const filteredCourses = courses.filter((course) =>
+    course.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   if (loading)
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -258,8 +266,8 @@ const UserPage = () => {
 
   if (!courses.length)
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4">
-        <div className="text-6xl mb-4">📚</div>
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 md:px-20">
+        <div className="text-6xl mb-4">📚</div> 
         <h2 className="text-2xl font-bold text-center mb-2">
           No Courses Found
         </h2>
@@ -273,145 +281,52 @@ const UserPage = () => {
     );
 
   return (
-    <div className="bg-background min-h-screen">
-      {/* Hero Section */}
-      {/* <section className="bg-gradient-to-r from-primary/20 to-purple-500/20 py-16">
-        <div className="container max-w-6xl mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Expand Your Knowledge
-          </h1>
-          <p className="text-xl mb-6 max-w-xl text-muted-foreground">
-            Discover top-quality courses designed to help you master new skills
-            and advance your career.
-          </p>
-          <Button asChild size="lg">
-            <Link href="/dashboard">My Dashboard</Link>
+    <div className="bg-black min-h-screen">
+      {/* Dark Coursera-Style Header */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between px-2 md:px-20 pt-10 pb-4">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-bold text-white">Courses</h1>
+          <p className="text-base text-gray-400 mt-1">Browse our catalog of top courses and start learning today.</p>
+        </div>
+        <div className="flex items-center gap-2 w-full md:w-auto md:justify-end">
+          <input
+            type="text"
+            placeholder="Search courses..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full md:w-80 px-5 py-2 border border-gray-700 rounded-full shadow-sm bg-[#23232b] text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-primary/60 transition placeholder-gray-500"
+            style={{ maxWidth: 350 }}
+          />
+          <Button variant="outline" className="rounded-full border-gray-700 shadow-sm px-5 py-2 h-auto bg-[#23232b] text-gray-100 hover:bg-[#23232b]/80">
+            <Filter className="mr-2 h-4 w-4" />
+            Filter
           </Button>
         </div>
-      </section> */}
-
-      {/* Courses Section */}
-      <section className="container max-w-6xl mx-auto px-4 py-16">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-10">
-          <h2 className="text-3xl font-bold text-foreground mb-4 md:mb-0">
-            Courses for You
-          </h2>
-          <div className="flex gap-4">
-            <Button variant="outline">
-              <BookOpen className="mr-2 h-4 w-4" />
-              My Learning {user && `(${enrolledCourses.length})`}
-            </Button>
-            <Button variant="outline">
-              <Heart className="mr-2 h-4 w-4" />
-              My Wishlist {user && `(${wishlist.length})`}
-            </Button>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {courses.map((course) => (
-            <Card
+      </div>
+      {/* Courses Grid */}
+      <div className="  mx-auto px-2 md:px-20 pb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+          {filteredCourses.map((course) => (
+            <Link
               key={course.id}
-              className="group bg-card border-card rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer relative "
-              onClick={() => navigateToCourse(course.id)}
+              href={`/course/${course.id}`}
+              className="block h-full cursor-pointer"
             >
-              {/* Ribbon for enrollments or popular courses */}
-              {enrolledCourses.includes(course.id) ? (
-                <div className="absolute top-4 right-0 z-10">
-                  <Badge className="bg-[#FA8500] text-white font-medium rounded-l-full rounded-r-none py-1 px-3">
-                    Enrolled
-                  </Badge>
-                </div>
-              ) : (
-                course.video_count > 10 && (
-                  <div className="absolute top-4 right-0 z-10">
-                    <Badge className="bg-[#FA8500] text-white font-medium rounded-l-full rounded-r-none py-1 px-3">
-                      Popular
-                    </Badge>
-                  </div>
-                )
-              )}
-
-              <div className="relative w-full overflow-hidden h-48">
-                <img
-                  src={
-                    course.thumbnail ||
-                    "https://placehold.co/600x400/3730a3/ffffff?text=Course"
-                  }
-                  alt={course.title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute bottom-4 left-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <Badge
-                    variant="outline"
-                    className="bg-black/50 text-white border-none"
-                  >
-                    <Video className="mr-1 h-3 w-3" />
-                    {course.video_count} videos
-                  </Badge>
-                  <Badge
-                    variant="outline"
-                    className="bg-black/50 text-white border-none"
-                  >
-                    <Clock className="mr-1 h-3 w-3" />
-                    {Math.round(course.video_count * 7)} min
-                  </Badge>
-                </div>
-              </div>
-              <div className="p-4">
-                <CardHeader className="p-5 pb-2">
-                  <CardTitle className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
-                    {course.title}
-                  </CardTitle>
-                  <CardDescription className="mt-2 text-sm line-clamp-2 h-10">
-                    {course.description ||
-                      "Dive into this comprehensive course designed to enhance your skills and knowledge."}
-                  </CardDescription>
-                </CardHeader>
-
-                <CardFooter className="p-5 pt-2 flex gap-2 border-t border-border/40">
-                  <Button
-                    className={`flex-1 ${
-                      enrolledCourses.includes(course.id)
-                        ? "bg-white hover:bg-[#FFAB49]"
-                        : "bg-primary hover:bg-primary/90"
-                    } cursor-pointer`}
-                    onClick={(e) => handleEnroll(e, course.id, course.title)}
-                    disabled={actionLoading === course.id}
-                  >
-                    {actionLoading === course.id ? (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    ) : null}
-                    {enrolledCourses.includes(course.id)
-                      ? "Continue Learning"
-                      : "Enroll Now"}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className={
-                      wishlist.includes(course.id)
-                        ? "text-red-500 border-red-200"
-                        : ""
-                    }
-                    onClick={(e) => toggleWishlist(e, course.id, course.title)}
-                    disabled={actionLoading === course.id}
-                  >
-                    {actionLoading === course.id ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Heart
-                        className={`h-5 w-5 ${
-                          wishlist.includes(course.id) ? "fill-red-500" : ""
-                        }`}
-                      />
-                    )}
-                  </Button>
-                </CardFooter>
-              </div>
-            </Card>
+              <CourseCard
+                title={course.title}
+                description={course.description}
+                isEnrolled={enrolledCourses.includes(course.id)}
+                numVideos={course.video_count}
+                duration="3h 45m"
+                thumbnailSrc={course.thumbnail || "https://placehold.co/600x400/3730a3/ffffff?text=Course"}
+                wishlisted={wishlist.includes(course.id)}
+                onEnroll={(e) => handleEnroll(e, course.id, course.title)}
+                onToggleWishlist={(e) => toggleWishlist(e, course.id, course.title)}
+              />
+            </Link>
           ))}
         </div>
-      </section>
+      </div>
     </div>
   );
 };

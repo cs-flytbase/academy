@@ -242,93 +242,7 @@ const VideoLandingPage = () => {
         </section>
 
         {/* Enhanced Testimonials Section with Real Images */}
-        <section className="py-16 md:py-24 bg-[#0B0B0B] text-white">
-          <div className="container mx-auto max-w-7xl px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-              {/* Testimonial 1 */}
-              <div className="flex flex-col h-full">
-                {/* Logo */}
-                <div className="mb-8 h-16 flex items-center">
-                  <img
-                    src="https://cdn.prod.website-files.com/65cf50589440654730dd6e6f/665722fc6555054b89f52e9b_download%204.png"
-                    alt="Drone Flight Academy"
-                    className="h-24 object-contain"
-                  />
-                </div>
-
-                {/* Testimonial Content */}
-                <div className="mb-8 flex-grow">
-                  <p className="text-lg text-gray-300 leading-relaxed">
-                    FlytBase Academy helped me get to know FlytBase. With the
-                    short videos about all the different topics, it was easy to
-                    guide myself through the software. I've learned things which
-                    I didn't even know were available on the platform. I
-                    recommend the FlytBase Academy to everyone who will use the
-                    software, even if you're an advanced user. We are looking
-                    forward to new modules and videos!
-                  </p>
-                </div>
-
-                {/* Profile */}
-                <div className="flex items-center mt-auto">
-                  <div className="w-16 h-16 rounded-full overflow-hidden mr-4 border-2 border-gray-700">
-                    <img
-                      src="https://cdn.prod.website-files.com/65cf50589440654730dd6e6f/6657253fc908a0d8cf741fa7_IMG_7611%20(1).jpg"
-                      alt="Job Vermeulen"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-xl">Job Vermeulen</h4>
-                    <p className="text-gray-400">Drone Flight Academy</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Testimonial 2 */}
-              <div className="flex flex-col h-full">
-                {/* Logo */}
-                <div className="mb-8 h-16 flex items-center">
-                  <img
-                    src="https://cdn.prod.website-files.com/65cf50589440654730dd6e6f/6672e18b3fa4a47bde4770e6_Groupe%20Protec%20Logo.png"
-                    alt="Protec Groupe"
-                    className="h-14 object-contain"
-                  />
-                </div>
-
-                {/* Testimonial Content */}
-                <div className="mb-8 flex-grow">
-                  <p className="text-lg text-gray-300 leading-relaxed">
-                    As a security company specializing in autonomous drone
-                    solutions, seamless integration with Video Management
-                    Systems like Milestone is crucial for delivering robust
-                    security solutions to our clients. The 'One Click
-                    Integrations with Flinks' course from FlytBase Academy
-                    accelerated our VMS integration with simplified setup
-                    procedures. Following the course instructions, I swiftly
-                    configured our drone video feed within our Milestone VMS,
-                    ensuring operational readiness.
-                  </p>
-                </div>
-
-                {/* Profile */}
-                <div className="flex items-center mt-auto">
-                  <div className="w-16 h-16 rounded-full overflow-hidden mr-4 border-2 border-gray-700">
-                    <img
-                      src="https://cdn.prod.website-files.com/65cf50589440654730dd6e6f/6672e0e309ed887628ee9d0e_WhatsApp%20Image%202024-06-18%20at%2017.22.51.jpeg"
-                      alt="Glenn Kinkenberg"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-xl">Glenn Kinkenberg</h4>
-                    <p className="text-gray-400">Groupe Protec</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+      
 
         {/* Why FlytBase Academy Section */}
         <section className="py-16 md:py-24 text-white">
@@ -551,7 +465,93 @@ const VideoLandingPage = () => {
         </section>
         {/* Featured Courses Section (Optional) */}
         {/* Wix-Style Courses Section */}
+        <section className="py-16 md:py-24 bg-[#0B0B0B] text-white">
+          <div className="container mx-auto max-w-7xl px-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+              {/* Testimonial 1 */}
+              <div className="flex flex-col h-full">
+                {/* Logo */}
+                <div className="mb-8 h-16 flex items-center">
+                  <img
+                    src="https://cdn.prod.website-files.com/65cf50589440654730dd6e6f/665722fc6555054b89f52e9b_download%204.png"
+                    alt="Drone Flight Academy"
+                    className="h-24 object-contain"
+                  />
+                </div>
 
+                {/* Testimonial Content */}
+                <div className="mb-8 flex-grow">
+                  <p className="text-lg text-gray-300 leading-relaxed">
+                    FlytBase Academy helped me get to know FlytBase. With the
+                    short videos about all the different topics, it was easy to
+                    guide myself through the software. I've learned things which
+                    I didn't even know were available on the platform. I
+                    recommend the FlytBase Academy to everyone who will use the
+                    software, even if you're an advanced user. We are looking
+                    forward to new modules and videos!
+                  </p>
+                </div>
+
+                {/* Profile */}
+                <div className="flex items-center mt-auto">
+                  <div className="w-16 h-16 rounded-full overflow-hidden mr-4 border-2 border-gray-700">
+                    <img
+                      src="https://cdn.prod.website-files.com/65cf50589440654730dd6e6f/6657253fc908a0d8cf741fa7_IMG_7611%20(1).jpg"
+                      alt="Job Vermeulen"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-xl">Job Vermeulen</h4>
+                    <p className="text-gray-400">Drone Flight Academy</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Testimonial 2 */}
+              <div className="flex flex-col h-full">
+                {/* Logo */}
+                <div className="mb-8 h-16 flex items-center">
+                  <img
+                    src="https://cdn.prod.website-files.com/65cf50589440654730dd6e6f/6672e18b3fa4a47bde4770e6_Groupe%20Protec%20Logo.png"
+                    alt="Protec Groupe"
+                    className="h-14 object-contain"
+                  />
+                </div>
+
+                {/* Testimonial Content */}
+                <div className="mb-8 flex-grow">
+                  <p className="text-lg text-gray-300 leading-relaxed">
+                    As a security company specializing in autonomous drone
+                    solutions, seamless integration with Video Management
+                    Systems like Milestone is crucial for delivering robust
+                    security solutions to our clients. The 'One Click
+                    Integrations with Flinks' course from FlytBase Academy
+                    accelerated our VMS integration with simplified setup
+                    procedures. Following the course instructions, I swiftly
+                    configured our drone video feed within our Milestone VMS,
+                    ensuring operational readiness.
+                  </p>
+                </div>
+
+                {/* Profile */}
+                <div className="flex items-center mt-auto">
+                  <div className="w-16 h-16 rounded-full overflow-hidden mr-4 border-2 border-gray-700">
+                    <img
+                      src="https://cdn.prod.website-files.com/65cf50589440654730dd6e6f/6672e0e309ed887628ee9d0e_WhatsApp%20Image%202024-06-18%20at%2017.22.51.jpeg"
+                      alt="Glenn Kinkenberg"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-xl">Glenn Kinkenberg</h4>
+                    <p className="text-gray-400">Groupe Protec</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
         {/* <ParallexCard/> */}
         {/* Know Your Stuff Section with Fixed CSS */}
 

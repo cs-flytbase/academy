@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { Sparkles } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
-import AssignmentCard from "@/components/AssignmentCard";
+import CertificateAssessmentCard from "@/components/CertificateAssessmentCard";
+import { useRouter } from "next/navigation";
 
 // Inline interface for Assignment matching your database schema
 interface Assignment {
@@ -22,6 +23,8 @@ interface Assignment {
 const Index = () => {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     const fetchAssignments = async () => {
@@ -62,39 +65,64 @@ const Index = () => {
     );
   }
 
+  // Filter assignments by search query
+  const filteredAssignments = assignments.filter((assignment) =>
+    assignment.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-12 max-w-screen-xl">
-        {/* Hero Section */}
-        {/* <section className="mb-16 text-center">
-          <div className="inline-flex items-center px-3 py-1 mb-6 text-sm font-medium bg-primary/10 text-primary rounded-full">
-            <Sparkles className="h-4 w-4 mr-2" />
-            <span>Testing Platform</span>
-          </div>
-
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">
-            Assignments &amp; Tests
-          </h1>
-
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-            Select an assignment to begin. Each assignment has a time limit, and
-            your progress will be tracked.
-          </p>
-
-          <div className="h-1 w-20 bg-primary mx-auto rounded-full" />
-        </section> */}
-
-        {/* Assignments Grid */}
-        <section>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {assignments.map((assignment) => (
-              <div key={assignment.id} className="animate-fade-in">
-                <AssignmentCard assignment={assignment} />
-                {/* {JSON.stringify(assignments[0])} */}
-              </div>
-            ))}
-          </div>
-        </section>
+    <div className="bg-black min-h-screen">
+      {/* Coursera-Style Header for Certificates */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between px-2 md:px-20 pt-10 pb-4">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-bold text-white">Certificates</h1>
+          <p className="text-base text-gray-400 mt-1">Complete an assessment to earn your professional certificate.</p>
+        </div>
+        <div className="flex items-center gap-2 w-full md:w-auto md:justify-end">
+          <input
+            type="text"
+            placeholder="Search certificates..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full md:w-80 px-5 py-2 border border-gray-700 rounded-full shadow-sm bg-[#23232b] text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-primary/60 transition placeholder-gray-500"
+            style={{ maxWidth: 350 }}
+          />
+          <button
+            className="rounded-full border border-gray-700 shadow-sm px-5 py-2 h-auto bg-[#23232b] text-gray-100 hover:bg-[#23232b]/80 flex items-center gap-2"
+            type="button"
+            tabIndex={-1}
+            disabled
+          >
+            {/* You can swap this icon for a filter icon if you want real filtering */}
+            <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707l-6.414 6.414A1 1 0 0013 13.414V19a1 1 0 01-1.447.894l-4-2A1 1 0 017 17V13.414a1 1 0 00-.293-.707L3.293 6.707A1 1 0 013 6V4z" /></svg>
+            Filter
+          </button>
+        </div>
+      </div>
+      {/* Certificates Grid */}
+      <div className="mx-auto px-2 md:px-20 pb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-2 mt-10">
+          {filteredAssignments.map((assignment) => (
+            <div key={assignment.id} className="animate-fade-in w-full ">
+              <CertificateAssessmentCard
+                courseTitle={assignment.title}
+                numQuestions={20}
+                duration={assignment.timeLimit ? `${assignment.timeLimit} min` : '45 min'}
+                difficulty={assignment.difficulty ?? 'Intermediate'}
+                onTakeTest={() => router.push(`/assignment/${assignment.id}`)}
+                onDetails={() => router.push(`/assignment/${assignment.id}`)}
+              />
+               {/* <CertificateAssessmentCard
+                courseTitle={assignment.title}
+                numQuestions={20}
+                duration={assignment.timeLimit ? `${assignment.timeLimit} min` : '45 min'}
+                difficulty={assignment.difficulty ?? 'Intermediate'}
+                onTakeTest={() => router.push(`/assignment/${assignment.id}`)}
+                onDetails={() => router.push(`/assignment/${assignment.id}`)}
+              /> */}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
