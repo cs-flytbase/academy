@@ -132,7 +132,7 @@ export function CourseCard({
           <CardContent className="px-3 pt-1 pb-1 flex-grow flex flex-col justify-between ">
             {/* Title and description */}
             <div className="space-y-0.5">
-              <h3 className="text-xl font-bold leading-tight text-white truncate">
+              <h3 className="text-xl font-bold leading-tight text-white ">
                 {title}
               </h3>
               <p className="text-xs text-gray-300 leading-relaxed line-clamp-3 mt-3">
@@ -149,7 +149,7 @@ export function CourseCard({
               className={cn(
                 "w-full py-2 rounded-xl font-bold text-sm",
                 isEnrolled
-                  ? "bg-gradient-to-r from-green-600 to-emerald-700 text-white cursor-not-allowed"
+                  ? "bg-gradient-to-r from-[#FA8500] to-[#FFAB49] text-white cursor-not-allowed"
                   : "bg-gradient-to-br from-[#3a8dff] to-[#0E61DD] text-white shadow-lg shadow-blue-900/20 hover:shadow-blue-800/40 relative overflow-hidden group/btn"
               )}
             >

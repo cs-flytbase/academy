@@ -212,7 +212,6 @@ const UserPage = () => {
           const { error } = await supabase.from("course_wishlist").insert({
             user_id: user.id,
             course_id: courseId,
-            added_at: new Date().toISOString(),
           });
 
           if (error) {

@@ -9,8 +9,11 @@ import Layout from "@/components/Layout/layout";
 import ParallexCard from "@/components/ParallexCard";
 import FAQ from "@/components/FAQ";
 import LearningShowcase from "@/components/LearningShowcase";
+import CourseCertificateSwitcher from "@/components/Courses-slide";
+import { useRouter } from "next/navigation";
 
 const VideoLandingPage = () => {
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -159,7 +162,7 @@ const VideoLandingPage = () => {
 
         {/* Hero Section with Video */}
         {/* Hero Section with Video - Nearly Full Width */}
-        <section className="relative py-6 px-4 md:px-5">
+        <section className="relative py-6 px-4 md:px-10">
           {/* Outer container with very wide max width */}
           <div className="container mx-auto max-w-[95%]">
             {/* Video wrapper with shadow and rounded corners */}
@@ -262,7 +265,10 @@ const VideoLandingPage = () => {
                   the ROI of your autonomous drone program.
                 </p>
                 <div>
-                  <button className="text-primary font-medium text-lg hover:underline">
+                  <button className="text-primary font-medium text-lg hover:underline cursor-pointer"
+                  onClick={() => router.push('/course')}
+
+                  >
                     See Courses
                   </button>
                 </div>
@@ -464,6 +470,9 @@ const VideoLandingPage = () => {
             </div>
           </div>
         </section>
+        {/* <div className="px-20">
+          <CourseCertificateSwitcher/>
+        </div> */}
         {/* Featured Courses Section (Optional) */}
         {/* Wix-Style Courses Section */}
         <section className="py-16 md:py-24 bg-[#0B0B0B] text-white">
@@ -557,7 +566,7 @@ const VideoLandingPage = () => {
         {/* Know Your Stuff Section with Fixed CSS */}
 
         {/* Learning Showcase */}
-        <LearningShowcase />
+
         {/* FAQ Section */}
         <FAQ />
       </div>

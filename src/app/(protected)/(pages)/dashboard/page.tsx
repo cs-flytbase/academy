@@ -1,4 +1,5 @@
 "use client";
+
 import { createClient } from "@/utils/supabase/client";
 import React, { useEffect, useState } from "react";
 import {
@@ -10,8 +11,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  BarChart,
-  Calendar,
   GraduationCap,
   Award,
   Clock,
@@ -21,11 +20,15 @@ import {
   Heart,
   BookText,
   LineChart,
-  Trophy,
   Users,
   Layers,
-  Bookmark,
   GraduationCap as GradCap,
+  ArrowRight,
+  Play,
+  RefreshCw,
+  Star,
+  CalendarDays,
+  BarChart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -33,6 +36,8 @@ import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 
 // Define types for our database schema
 interface CourseEnrollment {
@@ -92,9 +97,7 @@ const DashboardPage = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [enrolledCourses, setEnrolledCourses] = useState<EnrolledCourse[]>([]);
-  const [wishlistedCourses, setWishlistedCourses] = useState<
-    WishlistedCourse[]
-  >([]);
+  const [wishlistedCourses, setWishlistedCourses] = useState<WishlistedCourse[]>([]);
   const [stats, setStats] = useState<UserStats>({
     total_enrollments: 0,
     active_enrollments: 0,
@@ -237,298 +240,395 @@ const DashboardPage = () => {
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh]">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">You need to log in</h1>
-          <p className="text-muted-foreground mb-6">
-            Please sign in to view your dashboard
-          </p>
-          <Button asChild>
-            <Link href="/login">Login</Link>
-          </Button>
-        </div>
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold text-center">Sign In Required</CardTitle>
+            <CardDescription className="text-center">
+              Please sign in to view your dashboard
+            </CardDescription>
+          </CardHeader>
+          <CardFooter className="flex justify-center">
+            <Button size="lg" asChild>
+              <Link href="/login">Sign In</Link>
+            </Button>
+          </CardFooter>
+        </Card>
       </div>
     );
   }
 
+  // Get user initials for avatar
+  const getUserInitials = () => {
+    const name = user.user_metadata?.full_name || "User";
+    return name.split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .substring(0, 2);
+  };
+
   return (
-    <div className="container mx-auto py-8 px-4">
-      {/* Welcome Section */}
-      <section className="mb-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+    <div className="min-h-screen bg-background px-2 md:px-20 py-8">
+      {/* Header with user info */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <div className="flex items-center gap-4">
+          <Avatar className="h-12 w-12 border">
+            <AvatarImage src={user.user_metadata?.avatar_url} />
+            <AvatarFallback>{getUserInitials()}</AvatarFallback>
+          </Avatar>
           <div>
-            <h1 className="text-3xl font-bold mb-1">
-              Welcome back, {user.user_metadata?.full_name || "Learner"}
+            <h1 className="text-2xl font-bold">
+              Welcome, {user.user_metadata?.full_name || "Learner"}
             </h1>
             <p className="text-muted-foreground">
-              Track your enrolled courses and wishlist
+              {new Date().toLocaleDateString("en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
             </p>
           </div>
-          <div className="mt-4 sm:mt-0">
-            <Button asChild>
-              <Link href="/course">
-                Browse Courses <ChevronRight className="ml-1 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
         </div>
+        <Button asChild>
+          <Link href="/course">
+            Browse Courses <ChevronRight className="ml-1 h-4 w-4" />
+          </Link>
+        </Button>
+      </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground mb-1">
-                    Enrolled Courses
-                  </p>
-                  <p className="text-3xl font-bold">
-                    {stats.total_enrollments}
-                  </p>
-                </div>
-                <div className="p-2 bg-primary/10 rounded-full">
-                  <GraduationCap className="h-6 w-6 text-primary" />
-                </div>
+      {/* Dashboard Overview */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Enrolled Courses</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-baseline justify-between">
+              <div className="text-3xl font-bold">{stats.total_enrollments}</div>
+              <div className="p-2 bg-primary/10 rounded-full">
+                <GraduationCap className="h-5 w-5 text-primary" />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {stats.active_enrollments} in progress
+            </p>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground mb-1">
-                    Completed Courses
-                  </p>
-                  <p className="text-3xl font-bold">
-                    {stats.completed_enrollments}
-                  </p>
-                </div>
-                <div className="p-2 bg-green-500/10 rounded-full">
-                  <CheckCircle className="h-6 w-6 text-green-500" />
-                </div>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Completed</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-baseline justify-between">
+              <div className="text-3xl font-bold">{stats.completed_enrollments}</div>
+              <div className="p-2 bg-green-500/10 rounded-full">
+                <CheckCircle className="h-5 w-5 text-green-500" />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {stats.total_enrollments > 0 
+                ? `${Math.round((stats.completed_enrollments / stats.total_enrollments) * 100)}% completion rate`
+                : "No courses completed yet"}
+            </p>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground mb-1">
-                    Wishlist
-                  </p>
-                  <p className="text-3xl font-bold">{stats.wishlist_count}</p>
-                </div>
-                <div className="p-2 bg-red-500/10 rounded-full">
-                  <Heart className="h-6 w-6 text-red-500" />
-                </div>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Wishlist</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-baseline justify-between">
+              <div className="text-3xl font-bold">{stats.wishlist_count}</div>
+              <div className="p-2 bg-pink-500/10 rounded-full">
+                <Heart className="h-5 w-5 text-pink-500" />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Saved for later
+            </p>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground mb-1">
-                    Learning Hours
-                  </p>
-                  <p className="text-3xl font-bold">
-                    {stats.total_hours_spent.toFixed(1)}
-                  </p>
-                </div>
-                <div className="p-2 bg-amber-500/10 rounded-full">
-                  <Clock className="h-6 w-6 text-amber-500" />
-                </div>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Learning Hours</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-baseline justify-between">
+              <div className="text-3xl font-bold">{stats.total_hours_spent.toFixed(1)}</div>
+              <div className="p-2 bg-amber-500/10 rounded-full">
+                <Clock className="h-5 w-5 text-amber-500" />
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Total learning time
+            </p>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Main Dashboard Content */}
-      <Tabs defaultValue="enrolled" className="mb-8 ">
-        <TabsList className="grid w-full grid-cols-2 mb-6 h-full">
-          <TabsTrigger value="enrolled" className="text-base py-3">
-            <GradCap className="mr-2 h-4 w-4" /> Enrolled Courses
-          </TabsTrigger>
-          <TabsTrigger value="certificates" className="text-base py-3">
-            <Heart className="mr-2 h-4 w-4" /> Certificates
-          </TabsTrigger>
-        </TabsList>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left column - Your courses */}
+        <div className="lg:col-span-2">
+          <Tabs defaultValue="enrolled" className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Your Learning</h2>
+              <TabsList>
+                <TabsTrigger value="enrolled">All Courses</TabsTrigger>
+                <TabsTrigger value="certificates">Certificates</TabsTrigger>
+              </TabsList>
+            </div>
 
-        {/* ENROLLED COURSES TAB */}
-        <TabsContent value="enrolled">
-          {enrolledCourses.length > 0 ? (
-            <div className="space-y-6">
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold">Your Enrolled Courses</h2>
-                <p className="text-sm text-muted-foreground">
-                  {enrolledCourses.length} courses (
-                  {stats.completed_enrollments} completed)
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 gap-6">
-                {enrolledCourses.map((course) => (
-                  <Card key={course.id} className="overflow-hidden">
-                    <div className="flex flex-col md:flex-row">
-                      <div className="md:w-1/3 lg:w-1/4 aspect-video md:aspect-auto">
-                        <img
-                          src={course.thumbnail || "/placeholder-course.jpg"}
-                          alt={course.title}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="flex-1 p-6">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h3 className="text-xl font-bold mb-2">
-                              {course.title}
-                            </h3>
-                            <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                              {course.description}
-                            </p>
-                          </div>
-
-                          <Badge
-                            variant={
-                              course.status === "completed"
-                                ? "default"
-                                : "outline"
-                            }
-                            className={
-                              course.status === "completed"
-                                ? "bg-green-500 hover:bg-green-600"
-                                : ""
-                            }
-                          >
-                            {course.status === "completed"
-                              ? "Completed"
-                              : "In Progress"}
-                          </Badge>
-                        </div>
-
-                        <div className="space-y-2 mt-4">
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">
-                              Progress
-                            </span>
-                            <span className="font-medium">
-                              {course.progress}%
-                            </span>
-                          </div>
-                          <Progress value={course.progress} className="h-2" />
-
-                          <div className="flex flex-wrap justify-between items-center gap-2 pt-4">
-                            <div className="text-xs text-muted-foreground space-y-1">
-                              <div className="flex items-center">
-                                <BookOpen className="mr-1 h-3 w-3" />
-                                {course.completed_lessons}/{course.video_count}{" "}
-                                lessons completed
-                              </div>
-                              <div>
-                                Enrolled on:{" "}
-                                {new Date(
-                                  course.enrolled_at
-                                ).toLocaleDateString()}
-                              </div>
-                            </div>
-
-                            <Button size="sm" asChild>
-                              <Link href={`/course/${course.id}`}>
-                                {course.status === "completed"
-                                  ? "Review Course"
-                                  : "Continue Learning"}
-                              </Link>
+            {/* ENROLLED COURSES TAB */}
+            <TabsContent value="enrolled">
+              {enrolledCourses.length > 0 ? (
+                <div className="space-y-4">
+                  {enrolledCourses.map((course) => (
+                    <Card key={course.id} className="overflow-hidden">
+                      <div className="flex flex-col sm:flex-row">
+                        <div className="sm:w-1/3 lg:w-1/3 h-36 sm:h-auto relative group">
+                          <img
+                            src={course.thumbnail || "/placeholder-course.jpg"}
+                            alt={course.title}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button variant="secondary" size="icon" className="rounded-full">
+                              <Play className="h-6 w-6" />
                             </Button>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
+                        <div className="flex-1 p-4">
+                          <div className="flex justify-between">
+                            <div>
+                              <h3 className="font-semibold">{course.title}</h3>
+                              <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                                {course.description}
+                              </p>
+                            </div>
+                            <Badge
+                              variant={course.status === "completed" ? "default" : "outline"}
+                              className={course.status === "completed" ? "bg-green-500" : ""}
+                            >
+                              {course.status === "completed" ? "Completed" : "In Progress"}
+                            </Badge>
+                          </div>
 
-              {enrolledCourses.length > 5 && (
-                <div className="text-center mt-6">
-                  <Button variant="outline" asChild>
-                    <Link href="/my-courses">View All Enrolled Courses</Link>
-                  </Button>
+                          <div className="mt-4 space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-muted-foreground">Progress</span>
+                              <span>{course.progress}%</span>
+                            </div>
+                            <Progress value={course.progress} className="h-2" />
+
+                            <div className="flex justify-between items-center pt-2">
+                              <div className="text-xs text-muted-foreground">
+                                <div className="flex items-center">
+                                  <BookOpen className="mr-1 h-3 w-3" />
+                                  {course.completed_lessons}/{course.video_count} lessons
+                                </div>
+                              </div>
+
+                              <Button size="sm" asChild>
+                                <Link href={`/course/${course.id}`}>
+                                  {course.status === "completed" ? "Review" : "Continue"}
+                                  <ArrowRight className="ml-1 h-3 w-3" />
+                                </Link>
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+
+                  {enrolledCourses.length > 3 && (
+                    <div className="text-center mt-4">
+                      <Button variant="outline" asChild>
+                        <Link href="/my-courses">View All Courses</Link>
+                      </Button>
+                    </div>
+                  )}
                 </div>
+              ) : (
+                <Card className="bg-muted/40">
+                  <CardHeader>
+                    <CardTitle className="text-center">No Enrolled Courses</CardTitle>
+                    <CardDescription className="text-center">
+                      You haven't enrolled in any courses yet.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardFooter className="flex justify-center">
+                    <Button asChild>
+                      <Link href="/course">Browse Courses</Link>
+                    </Button>
+                  </CardFooter>
+                </Card>
               )}
-            </div>
-          ) : (
-            <div className="text-center py-12 bg-muted/40 rounded-lg border border-border">
-              <GraduationCap className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-2xl font-bold mb-2">No Enrolled Courses</h3>
-              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                You haven't enrolled in any courses yet. Browse our catalog to
-                find courses that match your interests.
-              </p>
-              <Button asChild>
-                <Link href="/course">Browse Courses</Link>
+            </TabsContent>
+
+            {/* CERTIFICATES TAB */}
+            <TabsContent value="certificates">
+              <Card className="bg-muted/40">
+                <CardHeader>
+                  <CardTitle className="text-center">No Certificates Yet</CardTitle>
+                  <CardDescription className="text-center">
+                    Complete courses to earn certificates.
+                  </CardDescription>
+                </CardHeader>
+                <CardFooter className="flex justify-center">
+                  <Button asChild>
+                    <Link href="/course">Continue Learning</Link>
+                  </Button>
+                </CardFooter>
+              </Card>
+            </TabsContent>
+          </Tabs>
+
+          {/* Recently viewed courses */}
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Recently Viewed</h2>
+              <Button variant="ghost" size="sm" className="gap-1">
+                <RefreshCw className="h-4 w-4" /> Refresh
               </Button>
             </div>
-          )}
-        </TabsContent>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {enrolledCourses.slice(0, 2).map((course) => (
+                <Card key={`recent-${course.id}`} className="overflow-hidden">
+                  <div className="flex">
+                    <div className="w-1/3 h-24 relative">
+                      <img
+                        src={course.thumbnail || "/placeholder-course.jpg"}
+                        alt={course.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 p-3">
+                      <h3 className="font-medium text-sm line-clamp-1">{course.title}</h3>
+                      <div className="flex items-center justify-between mt-2">
+                        <Progress value={course.progress} className="h-1 w-1/2" />
+                        <span className="text-xs text-muted-foreground">{course.progress}%</span>
+                      </div>
+                      <div className="mt-2">
+                        <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" asChild>
+                          <Link href={`/course/${course.id}`}>Continue</Link>
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
 
-        {/* WISHLIST TAB */}
-        <TabsContent value="certificates"></TabsContent>
-      </Tabs>
+        {/* Right column - Learning stats & quick links */}
+        <div>
+          {/* Learning activity */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="text-base">Learning Activity</CardTitle>
+              <CardDescription>Your learning trends</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[180px] flex items-end justify-between gap-2">
+                {Array.from({ length: 7 }).map((_, i) => {
+                  const height = Math.floor(Math.random() * (100 - 10) + 10);
+                  return (
+                    <div key={i} className="relative w-full">
+                      <div
+                        className="bg-primary/20 rounded-t"
+                        style={{ height: `${height}%` }}
+                      ></div>
+                      <div className="absolute -bottom-5 w-full text-center text-xs text-muted-foreground">
+                        {["M", "T", "W", "T", "F", "S", "S"][i]}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <Separator className="my-6" />
+              <div className="flex justify-between">
+                <div className="text-center">
+                  <h4 className="text-sm font-medium">Current Streak</h4>
+                  <p className="text-2xl font-bold">3 Days</p>
+                </div>
+                <div className="text-center">
+                  <h4 className="text-sm font-medium">Hours This Week</h4>
+                  <p className="text-2xl font-bold">8.5</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* Quick Links */}
-      <div className="mb-8">
-        <h2 className="text-xl font-bold mb-4">Quick Links</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Button
-            variant="outline"
-            className="justify-start h-auto py-6"
-            asChild
-          >
-            <Link href="/course">
-              <div className="flex flex-col items-center w-full text-center">
-                <BookOpen className="h-8 w-8 mb-2" />
-                <span className="font-medium">Browse Courses</span>
+          {/* Upcoming deadlines */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="text-base">Upcoming Deadlines</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-start">
+                  <div className="bg-muted p-2 rounded mr-3">
+                    <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium">Final Project Submission</h4>
+                    <p className="text-xs text-muted-foreground">Due in 5 days</p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <div className="bg-muted p-2 rounded mr-3">
+                    <BookText className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium">Module 3 Quiz</h4>
+                    <p className="text-xs text-muted-foreground">Due in 2 days</p>
+                  </div>
+                </div>
               </div>
-            </Link>
-          </Button>
-          <Button
-            variant="outline"
-            className="justify-start h-auto py-6"
-            asChild
-          >
-            <Link href="/my-courses">
-              <div className="flex flex-col items-center w-full text-center">
-                <GradCap className="h-8 w-8 mb-2" />
-                <span className="font-medium">My Learning</span>
-              </div>
-            </Link>
-          </Button>
-          <Button
-            variant="outline"
-            className="justify-start h-auto py-6"
-            asChild
-          >
-            <Link href="/assignment">
-              <div className="flex flex-col items-center w-full text-center">
-                <BookText className="h-8 w-8 mb-2" />
-                <span className="font-medium">Assignments</span>
-              </div>
-            </Link>
-          </Button>
-          <Button
-            variant="outline"
-            className="justify-start h-auto py-6"
-            asChild
-          >
-            <Link href="/profile">
-              <div className="flex flex-col items-center w-full text-center">
-                <Users className="h-8 w-8 mb-2" />
-                <span className="font-medium">My Profile</span>
-              </div>
-            </Link>
-          </Button>
+              <Button variant="outline" size="sm" className="w-full mt-4">
+                View All Tasks
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Quick Links */}
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Quick Links</h2>
+            <div className="grid grid-cols-2 gap-3">
+              <Button variant="outline" className="justify-start h-auto py-3" asChild>
+                <Link href="/course">
+                  <BookOpen className="mr-2 h-5 w-5 text-primary" />
+                  <span>Courses</span>
+                </Link>
+              </Button>
+              <Button variant="outline" className="justify-start h-auto py-3" asChild>
+                <Link href="/my-courses">
+                  <GradCap className="mr-2 h-5 w-5 text-green-500" />
+                  <span>My Learning</span>
+                </Link>
+              </Button>
+              <Button variant="outline" className="justify-start h-auto py-3" asChild>
+                <Link href="/assignment">
+                  <BookText className="mr-2 h-5 w-5 text-amber-500" />
+                  <span>Assignments</span>
+                </Link>
+              </Button>
+              <Button variant="outline" className="justify-start h-auto py-3" asChild>
+                <Link href="/profile">
+                  <Users className="mr-2 h-5 w-5 text-pink-500" />
+                  <span>Profile</span>
+                </Link>
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -538,64 +638,61 @@ const DashboardPage = () => {
 // Loading skeleton component
 const DashboardSkeleton = () => {
   return (
-    <div className="container mx-auto py-8 px-4">
-      {/* Welcome Section Skeleton */}
-      <section className="mb-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+    <div className="min-h-screen bg-background px-2 md:px-20 py-8">
+      {/* Header Skeleton */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-12 w-12 rounded-full" />
           <div>
-            <Skeleton className="h-10 w-64 mb-2" />
-            <Skeleton className="h-5 w-48" />
+            <Skeleton className="h-8 w-48 mb-1" />
+            <Skeleton className="h-4 w-36" />
           </div>
-          <Skeleton className="h-10 w-32 mt-4 sm:mt-0" />
         </div>
-
-        {/* Stats Cards Skeleton */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {Array(4)
-            .fill(0)
-            .map((_, i) => (
-              <Card key={i}>
-                <CardContent className="pt-6">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <Skeleton className="h-4 w-32 mb-2" />
-                      <Skeleton className="h-8 w-16" />
-                    </div>
-                    <Skeleton className="h-10 w-10 rounded-full" />
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-        </div>
-      </section>
-
-      {/* Tabs Skeleton */}
-      <div className="mb-8">
-        <Skeleton className="h-10 w-full mb-6" />
-
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <Skeleton className="h-8 w-48" />
-            <Skeleton className="h-4 w-32" />
-          </div>
-
-          {Array(3)
-            .fill(0)
-            .map((_, i) => (
-              <Skeleton key={i} className="h-48 w-full rounded-lg" />
-            ))}
-        </div>
+        <Skeleton className="h-10 w-36" />
       </div>
 
-      {/* Quick Links Skeleton */}
-      <div className="mb-8">
-        <Skeleton className="h-8 w-40 mb-4" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {Array(4)
-            .fill(0)
-            .map((_, i) => (
-              <Skeleton key={i} className="h-24 w-full rounded-lg" />
+      {/* Stats Cards Skeleton */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {Array(4).fill(0).map((_, i) => (
+          <Card key={i}>
+            <CardHeader className="pb-2">
+              <Skeleton className="h-4 w-24" />
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-baseline justify-between">
+                <Skeleton className="h-8 w-12" />
+                <Skeleton className="h-8 w-8 rounded-full" />
+              </div>
+              <Skeleton className="h-3 w-28 mt-2" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Main Content Skeleton */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
+          <div className="flex items-center justify-between mb-4">
+            <Skeleton className="h-6 w-32" />
+            <Skeleton className="h-10 w-48" />
+          </div>
+          
+          <div className="space-y-4">
+            {Array(3).fill(0).map((_, i) => (
+              <Skeleton key={i} className="h-48 w-full" />
             ))}
+          </div>
+        </div>
+        
+        <div>
+          <Skeleton className="h-[300px] w-full mb-6" />
+          <Skeleton className="h-[180px] w-full mb-6" />
+          <Skeleton className="h-6 w-32 mb-4" />
+          <div className="grid grid-cols-2 gap-3">
+            {Array(4).fill(0).map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full" />
+            ))}
+          </div>
         </div>
       </div>
     </div>
