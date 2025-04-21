@@ -29,7 +29,7 @@ export default function RootLayout({
       <body
         // Only use the custom font
         // className={`${primaryFont.variable} antialiased`}
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background overflow-x-hidden`}
         suppressHydrationWarning
       >
         <TestProvider>

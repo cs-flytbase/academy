@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import Layout from "@/components/Layout/layout";
 import ParallexCard from "@/components/ParallexCard";
 import FAQ from "@/components/FAQ";
+import LearningShowcase from "@/components/LearningShowcase";
 
 const VideoLandingPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -555,6 +556,8 @@ const VideoLandingPage = () => {
         {/* <ParallexCard/> */}
         {/* Know Your Stuff Section with Fixed CSS */}
 
+        {/* Learning Showcase */}
+        <LearningShowcase />
         {/* FAQ Section */}
         <FAQ />
       </div>

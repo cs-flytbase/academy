@@ -12,12 +12,11 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
-import { Heart, BookOpen, Clock, Video, Loader2 } from "lucide-react";
+import { Heart, BookOpen, Clock, Video, Loader2, Filter } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import CourseCard from "@/components/ui/course-card";
 import { Input } from "@/components/ui/input";
-import { Filter } from "lucide-react";
 
 interface Course {
   id: number;
@@ -281,31 +280,31 @@ const UserPage = () => {
     );
 
   return (
-    <div className="bg-black min-h-screen">
+    <div className="bg-black min-h-screen w-full max-w-full overflow-x-hidden">
       {/* Dark Coursera-Style Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between px-2 md:px-20 pt-10 pb-4">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-bold text-white">Courses</h1>
-          <p className="text-base text-gray-400 mt-1">Browse our catalog of top courses and start learning today.</p>
+      <div className="flex flex-col gap-4 px-3 md:flex-row md:items-center md:justify-between md:px-6 lg:px-20 pt-6 pb-4">
+        <div className="max-w-full">
+          <h1 className="text-xl md:text-3xl lg:text-4xl font-bold text-white truncate">Courses</h1>
+          <p className="text-xs md:text-base text-gray-400 mt-1">Browse our catalog of top courses and start learning today.</p>
         </div>
-        <div className="flex items-center gap-2 w-full md:w-auto md:justify-end">
+        <div className="flex flex-col sm:flex-row w-full items-center gap-2 md:w-auto md:justify-end">
           <input
             type="text"
-            placeholder="Search courses..."
+            placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full md:w-80 px-5 py-2 border border-gray-700 rounded-full shadow-sm bg-[#23232b] text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-primary/60 transition placeholder-gray-500"
-            style={{ maxWidth: 350 }}
+            className="w-full sm:w-auto md:w-64 lg:w-80 px-3 py-2 border border-gray-700 rounded-full shadow-sm bg-[#23232b] text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-primary/60 transition placeholder-gray-500 text-sm"
           />
-          <Button variant="outline" className="rounded-full border-gray-700 shadow-sm px-5 py-2 h-auto bg-[#23232b] text-gray-100 hover:bg-[#23232b]/80">
-            <Filter className="mr-2 h-4 w-4" />
+          <Button variant="outline" className="w-full sm:w-auto rounded-full border-gray-700 shadow-sm px-3 py-1 h-auto bg-[#23232b] text-gray-100 hover:bg-[#23232b]/80 text-sm">
+            <Filter className="mr-1 h-3 w-3" />
             Filter
           </Button>
         </div>
       </div>
+      
       {/* Courses Grid */}
-      <div className="  mx-auto px-2 md:px-20 pb-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+      <div className="w-full px-3 md:px-6 lg:px-20 pb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
           {filteredCourses.map((course) => (
             <Link
               key={course.id}
