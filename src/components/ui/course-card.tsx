@@ -80,7 +80,7 @@ export function CourseCard({
           />
           
           {/* THUMBNAIL - Flush with top */}
-          <div className="relative w-full h-[240px] overflow-hidden flex-none">
+          <div className="relative w-full h-1/2 overflow-hidden flex-none">
             <Image
               src={thumbnailSrc}
               alt={title}
@@ -99,20 +99,37 @@ export function CourseCard({
             )} />
             
             {/* Stats on top of the thumbnail */}
-            <div className="absolute bottom-4 left-4 flex items-center gap-3 z-20">
+            <div className="absolute bottom-4 left-4 flex items-center justify-between gap-3 z-20 w-full pr-7">
+              <div className="flex items-center gap-0">
               <span className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/10">
                 <Video className="h-3.5 w-3.5 text-[#3a8dff]" /> 
                 <span className="text-gray-200 text-xs">{numVideos} videos</span>
               </span>
-              
               <span className="flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/10">
-                <Clock className="h-3.5 w-3.5 text-[#3a8dff]" /> 
+                <Clock className="h-3.5 w-3.5 text-[#3a8dff]" />
                 <span className="text-gray-200 text-xs">{duration}</span>
               </span>
+              </div>
+              <div>
+              <Button
+              variant="ghost"
+              onClick={onToggleWishlist}
+              className={cn(
+                " rounded-full p-2 bg-black/40 backdrop-blur-sm border border-white/10",
+                "hover:bg-black/60 hover:border-[#3a8dff]/50 transition-all duration-300",
+                wishlisted ? "text-[#ff6b8a]" : "text-white"
+              )}
+            >
+              <Heart 
+                fill={wishlisted ? "currentColor" : "none"} 
+                className="h-5 w-5" 
+              />
+            </Button>
+              </div>
             </div>
             
             {/* Wishlist button - in top right corner */}
-            <Button
+            {/* <Button
               variant="ghost"
               onClick={onToggleWishlist}
               className={cn(
@@ -125,11 +142,11 @@ export function CourseCard({
                 fill={wishlisted ? "currentColor" : "none"} 
                 className="h-5 w-5" 
               />
-            </Button>
+            </Button> */}
           </div>
 
           {/* CONTENT */}
-          <CardContent className="px-3 pt-1 pb-1 flex-grow flex flex-col justify-between ">
+          <CardContent className="px-8 pt-1 pb-1 flex-grow flex flex-col justify-between ">
             {/* Title and description */}
             <div className="space-y-0.5">
               <h3 className="text-xl font-bold leading-tight text-white ">
@@ -142,7 +159,7 @@ export function CourseCard({
           </CardContent>
           
           {/* FOOTER - Always at bottom */}
-          <CardFooter className="px-3 pb-2 pt-0 mt-auto">
+          <CardFooter className="px-7 pb-5 pt-0 mt-auto">
             <Button
               onClick={onEnroll}
               disabled={isEnrolled}
