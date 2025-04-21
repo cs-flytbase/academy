@@ -1,11 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { createClient } from "@/utils/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { VideoIcon, PlusCircle, ListChecks, Users } from "lucide-react";
-import { useState, useEffect } from "react";
-import { createClient } from "@/utils/supabase/client";
 
 // Import all our tab components
 import VideoQuestionsTab from "./components/video-questions";
@@ -45,6 +44,7 @@ export default function AdminDashboard() {
     checkAdmin();
   }, []);
 
+  // If not admin, show loading or redirect
   if (isAdmin === null) {
     return (
       <div className="container mx-auto py-8 px-4">
