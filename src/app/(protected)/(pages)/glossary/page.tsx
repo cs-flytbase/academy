@@ -352,7 +352,7 @@ const GlossaryPage = () => {
           <div className="container mx-auto max-w-7xl">
             <div className="text-center max-w-4xl mx-auto">
               <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6">
-                FlytBase <span className="text-yellow-400">Glossary</span>
+                FlytBase <span className="text-[#2C7BF2]">Glossary</span>
               </h1>
               <p className="text-lg md:text-xl text-gray-300 mb-10">
                 Stay updated with drone terminologies with our glossary that goes beyond definitions.

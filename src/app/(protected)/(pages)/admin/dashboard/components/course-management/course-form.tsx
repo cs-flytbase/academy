@@ -68,10 +68,10 @@ const CourseForm: React.FC<CourseFormProps> = ({
           .update({
             title: formData.title,
             description: formData.description || null,
-            category: formData.category || null,
-            difficulty: formData.difficulty || null,
+            // category and difficulty fields don't exist in the database schema
             playlist_id: formData.playlist_id || null,
             thumbnail: formData.thumbnail || null,
+            // Include video_count if needed, but we normally don't update this manually
           })
           .eq("id", course.id);
 
@@ -82,10 +82,10 @@ const CourseForm: React.FC<CourseFormProps> = ({
         const { error } = await supabase.from("courses").insert({
           title: formData.title,
           description: formData.description || null,
-          category: formData.category || null,
-          difficulty: formData.difficulty || null,
+          // category and difficulty fields don't exist in the database schema
           playlist_id: formData.playlist_id || null,
           thumbnail: formData.thumbnail || null,
+          // video_count will be handled separately or set to default
         });
 
         if (error) throw error;
