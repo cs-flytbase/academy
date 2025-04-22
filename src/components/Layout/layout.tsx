@@ -438,9 +438,6 @@ const Layout = ({ children }: LayoutProps) => {
                       <Link href="/glossary" className="block px-4 py-2 text-sm hover:bg-accent hover:text-primary">
                       Glossary
                       </Link>
-                      <Link href="/tutorials" className="block px-4 py-2 text-sm hover:bg-accent hover:text-primary">
-                        Tutorials
-                      </Link>
                       <Link target="_blank" href="https://www.flytbase.com/webinars?utm_source=navbar&utm_medium=nav_webinar&utm_id=webinar_lead" className="block px-4 py-2 text-sm hover:bg-accent hover:text-primary">
                         Webinars
                       </Link>
@@ -487,13 +484,27 @@ const Layout = ({ children }: LayoutProps) => {
           >
             <div className="space-y-1 flex flex-col">
               <div onClick={() => setIsMenuOpen(false)}>
-                <NavLink href="/assignment">
-                  <span className="text-sm font-semibold">CERTIFICATES</span>
+                <NavLink href="/dashboard">
+                  <div className="flex items-center">
+                    <Home className="w-5 h-5 mr-2 text-primary" />
+                    <span className="text-sm font-semibold">DASHBOARD</span>
+                  </div>
                 </NavLink>
               </div>
               <div onClick={() => setIsMenuOpen(false)}>
                 <NavLink href="/course">
-                  <span className="text-sm font-semibold">COURSES</span>
+                  <div className="flex items-center">
+                    <BookOpen className="w-5 h-5 mr-2 text-primary" />
+                    <span className="text-sm font-semibold">COURSES</span>
+                  </div>
+                </NavLink>
+              </div>
+              <div onClick={() => setIsMenuOpen(false)}>
+                <NavLink href="/assignment">
+                  <div className="flex items-center">
+                    <Award className="w-5 h-5 mr-2 text-primary" />
+                    <span className="text-sm font-semibold">CERTIFICATES</span>
+                  </div>
                 </NavLink>
               </div>
               
@@ -505,9 +516,6 @@ const Layout = ({ children }: LayoutProps) => {
                 <div className="space-y-1 pl-3">
                   <Link href="/glossary" className="block py-2 text-sm hover:text-primary" onClick={() => setIsMenuOpen(false)}>
                     Glossary
-                  </Link>
-                  <Link href="/tutorials" className="block py-2 text-sm hover:text-primary" onClick={() => setIsMenuOpen(false)}>
-                    Tutorials
                   </Link>
                   <Link href="https://www.flytbase.com/webinars?utm_source=navbar&utm_medium=nav_webinar&utm_id=webinar_lead" className="block py-2 text-sm hover:text-primary" onClick={() => setIsMenuOpen(false)}>
                     Webinars
