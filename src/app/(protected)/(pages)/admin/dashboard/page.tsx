@@ -76,18 +76,22 @@ export default function AdminDashboard() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-        <TabsList className="grid grid-cols-4 sm:grid-cols-4 w-full p-1 mb-4 h-full">
-          <TabsTrigger value="video-questions" className="text-base py-2 px-3">
-            <VideoIcon className="mr-2 h-4 w-4" /> Video Questions
+        <TabsList className="flex flex-wrap w-full p-1 mb-4 h-full overflow-hidden">
+          <TabsTrigger value="video-questions" className="flex-1 text-xs sm:text-sm md:text-base py-2 px-1 sm:px-3 flex flex-col sm:flex-row items-center justify-center sm:justify-start">
+            <VideoIcon className="h-4 w-4 mb-1 sm:mb-0 sm:mr-2" /> 
+            <span className="truncate">Video Questions</span>
           </TabsTrigger>
-          <TabsTrigger value="course-management" className="text-base py-2 px-3">
-            <PlusCircle className="mr-2 h-4 w-4" /> Courses
+          <TabsTrigger value="course-management" className="flex-1 text-xs sm:text-sm md:text-base py-2 px-1 sm:px-3 flex flex-col sm:flex-row items-center justify-center sm:justify-start">
+            <PlusCircle className="h-4 w-4 mb-1 sm:mb-0 sm:mr-2" /> 
+            <span className="truncate">Courses</span>
           </TabsTrigger>
-          <TabsTrigger value="assessments" className="text-base py-2 px-3">
-            <ListChecks className="mr-2 h-4 w-4" /> Assessments
+          <TabsTrigger value="assessments" className="flex-1 text-xs sm:text-sm md:text-base py-2 px-1 sm:px-3 flex flex-col sm:flex-row items-center justify-center sm:justify-start">
+            <ListChecks className="h-4 w-4 mb-1 sm:mb-0 sm:mr-2" /> 
+            <span className="truncate">Assessments</span>
           </TabsTrigger>
-          <TabsTrigger value="users" className="text-base py-2 px-3">
-            <Users className="mr-2 h-4 w-4" /> User Management
+          <TabsTrigger value="users" className="flex-1 text-xs sm:text-sm md:text-base py-2 px-1 sm:px-3 flex flex-col sm:flex-row items-center justify-center sm:justify-start">
+            <Users className="h-4 w-4 mb-1 sm:mb-0 sm:mr-2" /> 
+            <span className="truncate">User Management</span>
           </TabsTrigger>
         </TabsList>
 

@@ -453,7 +453,7 @@ const DashboardPage = () => {
         </div>
 
         {/* Dashboard Overview */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-12">
           <Card className="bg-gradient-to-br from-[#1a1a1a] to-[#222222] border border-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
             <CardHeader className="pb-2 pt-4 px-6">
               <CardTitle className="text-sm font-medium text-gray-400 group-hover:text-gray-300 transition-colors">Enrolled Courses</CardTitle>
@@ -471,45 +471,41 @@ const DashboardPage = () => {
             </CardContent>
           </Card>
 
-        <Card className="bg-[#1a1a1a] border-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-          <CardHeader className="pb-2 pt-4 px-6">
-            <CardTitle className="text-sm font-medium text-gray-400">Completed</CardTitle>
-          </CardHeader>
-          <CardContent className="pb-4 px-6">
-            <div className="flex items-baseline justify-between">
-              <div className="text-3xl font-bold text-white">{stats.completed_enrollments}</div>
-              <div className="p-2 bg-green-500/20 rounded-full">
-                <CheckCircle className="h-5 w-5 text-green-500" />
+          <Card className="bg-[#1a1a1a] border border-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
+            <CardHeader className="pb-2 pt-4 px-6">
+              <CardTitle className="text-sm font-medium text-gray-400 group-hover:text-gray-300 transition-colors">Completed</CardTitle>
+            </CardHeader>
+            <CardContent className="pb-4 px-6">
+              <div className="flex items-baseline justify-between">
+                <div className="text-3xl font-bold text-white">{stats.completed_enrollments}</div>
+                <div className="p-2 bg-green-500/20 rounded-full group-hover:bg-green-500/30 transition-colors">
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                </div>
               </div>
-            </div>
-            <p className="text-xs text-gray-500 mt-1">
-              {stats.total_enrollments > 0 
-                ? `${Math.round((stats.completed_enrollments / stats.total_enrollments) * 100)}% completion rate`
-                : "No courses completed yet"}
-            </p>
-          </CardContent>
-        </Card>
+              <p className="text-xs text-gray-500 mt-1">
+                {stats.total_enrollments > 0 
+                  ? `${Math.round((stats.completed_enrollments / stats.total_enrollments) * 100)}% completion rate`
+                  : "No courses completed yet"}
+              </p>
+            </CardContent>
+          </Card>
 
-        <Card className="bg-[#1a1a1a] border-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-          <CardHeader className="pb-2 pt-4 px-6">
-            <CardTitle className="text-sm font-medium text-gray-400">Wishlist</CardTitle>
-          </CardHeader>
-          <CardContent className="pb-4 px-6">
-            <div className="flex items-baseline justify-between">
-              <div className="text-3xl font-bold text-white">{stats.wishlist_count}</div>
-              <div className="p-2 bg-pink-500/20 rounded-full">
-                <Heart className="h-5 w-5 text-pink-500" />
+          <Card className="bg-[#1a1a1a] border border-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
+            <CardHeader className="pb-2 pt-4 px-6">
+              <CardTitle className="text-sm font-medium text-gray-400 group-hover:text-gray-300 transition-colors">Wishlist</CardTitle>
+            </CardHeader>
+            <CardContent className="pb-4 px-6">
+              <div className="flex items-baseline justify-between">
+                <div className="text-3xl font-bold text-white">{stats.wishlist_count}</div>
+                <div className="p-2 bg-pink-500/20 rounded-full group-hover:bg-pink-500/30 transition-colors">
+                  <Heart className="h-5 w-5 text-pink-500" />
+                </div>
               </div>
-            </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Saved for later
-            </p>
-          </CardContent>
-        </Card>
-
-       
-        
- 
+              <p className="text-xs text-gray-500 mt-1">
+                Saved for later
+              </p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Main Dashboard Content */}
@@ -773,7 +769,7 @@ const DashboardPage = () => {
       </div>
     </div>
     </div>
-    
+
   );
 };
 
