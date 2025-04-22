@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { MultiSelect } from "@/components/ui/multi-select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 import { Course } from "../types";
@@ -63,12 +63,32 @@ const AssessmentDialog: React.FC<AssessmentDialogProps> = ({
   };
 
   // Handle course selection
-  const handleCourseChange = (selectedCourses: string[]) => {
+  const handleCourseChange = (courseId: string) => {
+    console.log('Selected course:', courseId);
+    
+    if (!courseId) return;
+    
+    // Add the course to the array if it's not already included
+    if (!assessmentForm.courses.includes(courseId)) {
+      setAssessmentForm({
+        ...assessmentForm,
+        courses: [...assessmentForm.courses, courseId],
+      });
+    }
+  };
+  
+  // Remove a course from selection
+  const removeCourse = (courseId: string) => {
     setAssessmentForm({
       ...assessmentForm,
-      courses: selectedCourses,
+      courses: assessmentForm.courses.filter(id => id !== courseId),
     });
   };
+  
+  // Log available courses when they change
+  React.useEffect(() => {
+    console.log(`AssessmentDialog received ${courses.length} courses:`, courses);
+  }, [courses]);
 
   // Create or update an assessment
   const createOrUpdateAssessment = async () => {
@@ -84,8 +104,8 @@ const AssessmentDialog: React.FC<AssessmentDialogProps> = ({
     }
 
     // Only require course selection when creating a new assessment, not when editing
-    if (!isEditingAssessment && assessmentForm.courses.length === 0) {
-      toast.error("Please select at least one course");
+    if (!isEditingAssessment && (!assessmentForm.courses || assessmentForm.courses.length === 0)) {
+      toast.error("Please select a course");
       return;
     }
 
@@ -139,7 +159,31 @@ const AssessmentDialog: React.FC<AssessmentDialogProps> = ({
           throw new Error(`Error: ${response.status}`);
         }
 
-        toast.success("Assessment creation request submitted successfully!");
+        // Get the assessment ID from the response
+        const responseData = await response.json();
+        const assessmentId = responseData.assessment_id;
+        
+        if (assessmentId) {
+          // Create entries in the course_assessments table for each selected course
+          for (const courseId of assessmentForm.courses) {
+            const { error: courseAssessmentError } = await supabase
+              .from("course_assessments")
+              .insert({
+                course_id: parseInt(courseId),
+                assessment_id: assessmentId
+              });
+            
+            if (courseAssessmentError) {
+              console.error("Error creating course-assessment relationship:", courseAssessmentError);
+              // Continue with other inserts even if one fails
+            }
+          }
+          
+          toast.success("Assessment created and linked to courses successfully!");
+        } else {
+          toast.success("Assessment creation request submitted successfully!");
+          console.warn("Assessment ID not returned from webhook. Could not create course_assessments entries.");
+        }
 
         // Refresh the assessments list after a short delay to allow for creation
         setTimeout(() => {
@@ -247,15 +291,61 @@ const AssessmentDialog: React.FC<AssessmentDialogProps> = ({
 
               {/* Course Selection */}
               <div className="grid gap-2">
-                <Label>Select Courses *</Label>
-                <MultiSelect
-                  options={courses.map(course => ({ label: course.title, value: course.id }))}
-                  selected={assessmentForm.courses}
-                  onChange={handleCourseChange}
-                  placeholder="Select courses..."
-                />
-                <p className="text-sm text-muted-foreground mt-1">
-                  Questions will be generated from the selected courses.
+                <Label htmlFor="courses">Course(s) *</Label>
+                <div className="relative">
+                  {process.env.NODE_ENV === 'development' && (
+                    <div className="text-xs text-muted-foreground mb-2">
+                      Available courses: {courses.length}
+                    </div>
+                  )}
+                  
+                  {/* Display selected courses as badges */}
+                  {assessmentForm.courses.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {assessmentForm.courses.map(courseId => {
+                        const course = courses.find(c => c.id === courseId);
+                        return (
+                          <div key={courseId} className="flex items-center gap-1 px-2 py-1 bg-secondary rounded-full text-xs">
+                            <span>{course ? course.title : courseId}</span>
+                            <button 
+                              type="button" 
+                              onClick={() => removeCourse(courseId)}
+                              className="text-muted-foreground hover:text-destructive"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                  
+                  {/* Course dropdown */}
+                  {courses && courses.length > 0 ? (
+                    <Select
+                      onValueChange={handleCourseChange}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select courses..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {courses
+                          .filter(course => !assessmentForm.courses.includes(course.id))
+                          .map(course => (
+                            <SelectItem key={course.id} value={course.id}>
+                              {course.title || `Course ${course.id}`}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <div className="p-4 border border-dashed rounded-md bg-muted text-center">
+                      <p className="text-sm text-muted-foreground">No courses found. Please add courses first.</p>
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Questions will be generated from selected courses.
                 </p>
               </div>
 

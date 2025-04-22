@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Check, X, Download, Award, ArrowLeft, Loader2, ExternalLink } from "lucide-react";
+import { Check, X, Download, Award, ArrowLeft, Loader2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import Link from "next/link";
@@ -201,8 +201,8 @@ const CertificatePage = () => {
       return;
     }
     
-    if (!currentUser) {
-      toast.error("User information not available");
+    if (!currentUser || !assessment || !course) {
+      toast.error("Missing required information to generate certificate");
       return;
     }
     
@@ -213,12 +213,11 @@ const CertificatePage = () => {
       const certificateData = {
         email: currentUser.email,
         name: currentUser.user_metadata?.full_name || currentUser.email,
-        assessment: assessment?.title || "",
-        assessmentID: assessmentId.toString(),
-        userID: currentUser.id
+        course: course.title,
+        courseID: course.id.toString(),
+        userID: currentUser.id,
+        assessmentID: assessmentId
       };
-      
-      console.log("Sending certificate data:", certificateData);
       
       // Send data to the webhook
       const response = await fetch(
@@ -236,38 +235,12 @@ const CertificatePage = () => {
         throw new Error(`Error: ${response.status}`);
       }
       
-      // Parse the response to get the certificate URL
-      const responseData = await response.json();
-      const certificateUrl = responseData.url;
-      
-      if (!certificateUrl) {
-        throw new Error("Certificate URL not found in response");
-      }
-      
-      // Save the certificate to the database
-      const { data: newCertificate, error: saveError } = await supabase
-        .from("certificate_user")
-        .insert({
-          user_id: currentUser.id,
-          assessment_id: Number(assessmentId),
-          url: certificateUrl,
-          name: certificateData.name,
-          email: certificateData.email
-        })
-        .select()
-        .single();
-      
-      if (saveError) {
-        console.error("Error saving certificate:", saveError);
-        throw new Error("Failed to save certificate information");
-      }
-      
-      toast.success("Certificate generated successfully!");
-      setCertificate(newCertificate);
-      setGeneratingCertificate(false);
-      
-      // Open the certificate in a new tab
-      window.open(certificateUrl, "_blank");
+      // Wait for 2 seconds to allow certificate creation to complete on server
+      setTimeout(() => {
+        toast.success("Certificate generated successfully!");
+        fetchData(); // Refresh the data to get the newly created certificate
+        setGeneratingCertificate(false);
+      }, 2000);
       
     } catch (error) {
       console.error("Error generating certificate:", error);
@@ -301,7 +274,7 @@ const CertificatePage = () => {
 
   return (
     <div className="min-h-screen bg-[#121212] text-white">
-      <div className="max-w-3xl mx-auto p-6 md:p-8">
+      <div className="max-w-4xl mx-auto p-6 md:p-8">
         {/* Back button */}
         <Link href="/dashboard" className="inline-flex items-center text-gray-400 hover:text-white mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -310,91 +283,157 @@ const CertificatePage = () => {
         
         <div className="flex flex-col md:flex-row justify-between items-start mb-8">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold">{assessment?.title} Certificate</h1>
+            <h1 className="text-2xl md:text-3xl font-bold">{assessment.title} Certificate</h1>
             {course && <p className="text-gray-400 mt-1">Course: {course.title}</p>}
+          </div>
+
+          {/* Assessment meta */}
+          <div className="mt-4 md:mt-0 flex flex-wrap gap-2">
+            {assessment.difficulty && (
+              <span className="px-3 py-1 rounded-full text-xs bg-[#242424] text-gray-300">
+                {assessment.difficulty}
+              </span>
+            )}
+            {assessment.category && (
+              <span className="px-3 py-1 rounded-full text-xs bg-[#242424] text-gray-300">
+                {assessment.category}
+              </span>
+            )}
+            {assessment.time_limit && (
+              <span className="px-3 py-1 rounded-full text-xs bg-[#242424] text-gray-300">
+                {assessment.time_limit} min
+              </span>
+            )}
           </div>
         </div>
 
-        {/* Certificate Card */}
-        <div className="bg-[#1a1a1a] p-8 rounded-lg border border-gray-800 shadow-xl">
+        {/* Certificate Preview */}
+        <div className="bg-[#1a1a1a] p-6 rounded-lg border border-gray-800">
           {isCertificateUnlocked() ? (
             <>
-              <div className="mb-6 text-center">
-                <Award className="w-16 h-16 text-[#6b5de4] mx-auto mb-4" />
-                <h2 className="text-2xl font-bold mb-2">Congratulations!</h2>
-                <p className="text-gray-300">
-                  You've successfully passed the assessment for {assessment?.title}
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-green-400 flex items-center">
+                  <Check className="w-5 h-5 mr-2" />
+                  You've passed this assessment!
                 </p>
               </div>
-              
-              {certificate ? (
-                <div className="bg-[#242424] p-6 rounded-lg mb-6">
-                  <div className="flex items-center text-green-400 mb-3">
-                    <Check className="w-5 h-5 mr-2" />
-                    <p className="font-medium">Certificate Available</p>
+
+              <div className="aspect-[4/3] max-w-2xl mx-auto bg-[#242424] rounded-lg flex flex-col items-center justify-center p-8 transition-all duration-300 hover:shadow-lg">
+                <div className="text-center">
+                  <Award className="w-16 h-16 text-[#6b5de4] mx-auto mb-4" />
+                  <h3 className="text-2xl font-bold mb-4">
+                    Certificate of Completion
+                  </h3>
+                  <div className="w-24 h-1 bg-[#6b5de4] mx-auto mb-4"></div>
+                  <p className="text-gray-300 mb-2">This certifies that</p>
+                  <p className="text-xl font-semibold mb-2">{currentUser?.email}</p>
+                  <p className="text-gray-300 mb-2">has successfully completed</p>
+                  <p className="text-xl font-semibold mb-6">{assessment.title}</p>
+                  
+                  <div className="flex justify-center text-gray-400 text-sm">
+                    <p>Issued {new Date().toLocaleDateString()}</p>
                   </div>
-                  
-                  <p className="text-sm text-gray-300 mb-3">
-                    Your certificate was generated on {new Date(certificate.created_at).toLocaleDateString()}
+                </div>
+              </div>
+
+              {/* Certificate status */}
+              {certificate && (
+                <div className="mt-4 p-3 bg-green-500/10 border border-green-500/30 rounded-md">
+                  <div className="flex items-center text-green-400 mb-2">
+                    <Check className="w-5 h-5 mr-2" />
+                    <p className="font-medium">
+                      Certificate already generated!
+                    </p>
+                  </div>
+                  <p className="text-sm text-gray-300 mb-2">
+                    Your certificate was created on{" "}
+                    {new Date(certificate.created_at).toLocaleDateString()}.
                   </p>
-                  
-                  {certificate.url && (
-                    <div className="mt-4 flex items-center justify-center">
-                      <Button
-                        onClick={openCertificate}
-                        className="bg-green-600 hover:bg-green-700 py-3 px-6"
-                      >
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        View Certificate
-                      </Button>
-                    </div>
+                  {certificate.name && (
+                    <p className="text-sm text-gray-300">
+                      Recipient:{" "}
+                      <span className="text-white">
+                        {certificate.name}
+                      </span>
+                    </p>
                   )}
                 </div>
+              )}
+
+              {certificate ? (
+                <Button
+                  onClick={openCertificate}
+                  className="w-full bg-green-600 hover:bg-green-700 py-3 mt-4"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Download Certificate
+                </Button>
               ) : (
-                <div className="bg-[#242424] p-6 rounded-lg mb-6">
-                  <p className="text-center text-gray-300 mb-6">
-                    You've passed the assessment and qualify for a certificate. Generate it now!
-                  </p>
-                  
-                  <div className="flex items-center justify-center">
-                    <Button
-                      onClick={generateCertificate}
-                      disabled={generatingCertificate}
-                      className="bg-[#6b5de4] hover:bg-[#5a4dd0] py-3 px-6"
-                    >
-                      {generatingCertificate ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Generating...
-                        </>
-                      ) : (
-                        <>
-                          <Award className="w-4 h-4 mr-2" />
-                          Generate Certificate
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </div>
+                <Button
+                  onClick={generateCertificate}
+                  disabled={generatingCertificate}
+                  className="w-full bg-[#6b5de4] hover:bg-[#5a4dd0] py-3 mt-4"
+                >
+                  {generatingCertificate ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Generating Certificate...
+                    </>
+                  ) : (
+                    <>
+                      <Award className="w-4 h-4 mr-2" />
+                      Generate Certificate
+                    </>
+                  )}
+                </Button>
               )}
             </>
           ) : (
             <>
-              <div className="mb-6 text-center">
-                <X className="w-16 h-16 text-red-400 mx-auto mb-4" />
-                <h2 className="text-2xl font-bold mb-2">Certificate Not Available</h2>
-                <p className="text-gray-300 mb-6">
-                  You need to pass the assessment to earn your certificate.
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-gray-300 flex items-center">
+                  <X className="w-5 h-5 mr-2 text-red-400" />
+                  You need to pass the assessment to earn your certificate
                 </p>
               </div>
-              
-              <div className="bg-[#242424] p-6 rounded-lg mb-6">
-                <h3 className="font-medium text-lg mb-4">Assessment Attempts</h3>
+
+              <div className="aspect-[4/3] max-w-2xl mx-auto bg-[#242424] rounded-lg flex flex-col items-center justify-center p-8 relative overflow-hidden">
+                {/* Locked overlay */}
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-10">
+                  <div className="bg-[#1a1a1a] rounded-full p-5 shadow-lg">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-12 w-12 text-[#6b5de4]"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Blurred certificate preview */}
+                <div className="text-center filter blur-sm">
+                  <h3 className="text-2xl font-bold mb-4">
+                    Certificate of Completion
+                  </h3>
+                  <div className="w-24 h-1 bg-[#6b5de4] mx-auto mb-4"></div>
+                  <p className="text-gray-400 mb-6">
+                    Pass the assessment to unlock your certificate
+                  </p>
+                </div>
+              </div>
+
+              {/* Assessment attempt info */}
+              <div className="mt-6">
+                <h3 className="font-medium text-lg mb-2">Your Attempts</h3>
                 
                 {attempts.length > 0 ? (
-                  <div className="space-y-3 mb-6">
+                  <div className="space-y-2">
                     {attempts.map((attempt) => (
-                      <div key={attempt.id} className="border border-gray-700 p-3 rounded-md flex justify-between items-center">
+                      <div key={attempt.id} className="bg-[#242424] p-3 rounded-md flex justify-between items-center">
                         <div>
                           <p className="text-sm">
                             Attempt #{attempt.attempt_number} -{" "}
@@ -423,36 +462,29 @@ const CertificatePage = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-400 text-sm mb-6">You haven't attempted this assessment yet.</p>
+                  <p className="text-gray-400 text-sm">You haven't attempted this assessment yet.</p>
                 )}
                 
-                <div className="flex items-center justify-center">
-                  <Button
-                    onClick={() => router.push(`/test/${assessmentId}`)}
-                    className="bg-[#6b5de4] hover:bg-[#5a4dd0] py-3 px-6"
-                  >
-                    Take Assessment
-                  </Button>
-                </div>
+                <Button
+                  onClick={() => router.push(`/test/${assessmentId}`)}
+                  className="w-full bg-[#6b5de4] hover:bg-[#5a4dd0] py-3 mt-4"
+                >
+                  Take Assessment
+                </Button>
               </div>
             </>
           )}
         </div>
 
-        {/* Back links */}
-        <div className="mt-8 pt-6 border-t border-gray-800 flex flex-col sm:flex-row sm:justify-between gap-4">
-          <Link href="/dashboard" className="text-[#6b5de4] hover:text-[#5a4dd0] flex items-center">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
-          </Link>
-          
-          {course && (
+        {/* Course link */}
+        {course && (
+          <div className="mt-8 border-t border-gray-800 pt-6">
             <Link href={`/course/${course.id}`} className="text-[#6b5de4] hover:text-[#5a4dd0] flex items-center">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to {course.title}
             </Link>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,0 +1,5 @@
+/* Custom styling for Progress component */
+.h-2.bg-gray-700 [role="progressbar"] {
+  background-color: var(--progress-background, #6b5de4);
+  transition: width 0.3s ease;
+}

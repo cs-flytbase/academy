@@ -53,13 +53,21 @@ export default function AssessmentsTab() {
   // Fetch all courses
   const fetchCourses = async () => {
     try {
+      console.log('Fetching courses...');
       const { data, error } = await supabase
         .from("courses")
-        .select("*")
+        .select("id, title, description")
         .order("title", { ascending: true });
 
       if (error) throw error;
-      setCourses(data || []);
+      
+      if (data) {
+        console.log(`Fetched ${data.length} courses:`, data);
+        setCourses(data);
+      } else {
+        console.warn('No courses found in the database');
+        setCourses([]);
+      }
     } catch (error) {
       console.error("Error fetching courses:", error);
       toast.error("Failed to load courses");
@@ -218,17 +226,30 @@ export default function AssessmentsTab() {
 
       {/* Assessment Dialog */}
       {showAssessmentDialog && (
-        <AssessmentDialog
-          isOpen={showAssessmentDialog}
-          onClose={() => setShowAssessmentDialog(false)}
-          assessmentForm={assessmentForm}
-          setAssessmentForm={setAssessmentForm}
-          isEditingAssessment={isEditingAssessment}
-          isCreatingAssessment={isCreatingAssessment}
-          setIsCreatingAssessment={setIsCreatingAssessment}
-          fetchAssessments={fetchAssessments}
-          courses={courses}
-        />
+        <>
+          {/* Debug info */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="fixed bottom-4 right-4 p-4 bg-black/80 text-white text-xs rounded max-w-md z-50 overflow-auto" style={{ maxHeight: '200px' }}>
+              <p><strong>Debug:</strong> {courses.length} courses available</p>
+              <pre>{JSON.stringify(courses, null, 2)}</pre>
+            </div>
+          )}
+          <AssessmentDialog
+            isOpen={showAssessmentDialog}
+            onClose={() => {
+              setShowAssessmentDialog(false);
+              // Refetch courses when closing to ensure they're loaded next time
+              fetchCourses();
+            }}
+            assessmentForm={assessmentForm}
+            setAssessmentForm={setAssessmentForm}
+            isEditingAssessment={isEditingAssessment}
+            isCreatingAssessment={isCreatingAssessment}
+            setIsCreatingAssessment={setIsCreatingAssessment}
+            fetchAssessments={fetchAssessments}
+            courses={courses}
+          />
+        </>
       )}
 
       {/* Delete Confirmation Dialog */}

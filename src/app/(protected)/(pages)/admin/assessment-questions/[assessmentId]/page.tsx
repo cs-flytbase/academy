@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, ArrowLeft, RefreshCw, Edit, Trash2, Save, Pencil } from "lucide-react";
+import { PlusCircle, ArrowLeft, RefreshCw, Edit, Trash2, Save, Pencil, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -49,7 +49,11 @@ export default function AssessmentQuestionsPage({ params }: { params: Promise<{ 
   const [assessmentForm, setAssessmentForm] = useState({
     title: "",
     description: "",
-    time_limit: 60
+    category: "",
+    difficulty: "beginner",
+    time_limit: 60 as number,
+    thumbnail: "",
+    course_id: null as number | null
   });
   const [isSavingAssessment, setIsSavingAssessment] = useState(false);
 
@@ -97,9 +101,13 @@ export default function AssessmentQuestionsPage({ params }: { params: Promise<{ 
       setAssessment(data);
       // Initialize assessment form with current values
       setAssessmentForm({
-        title: data.title,
-        description: data.description,
-        time_limit: data.time_limit
+        title: data.title || "",
+        description: data.description || "",
+        category: data.category || "",
+        difficulty: data.difficulty || "beginner",
+        time_limit: data.time_limit || 60,
+        thumbnail: data.thumbnail || "",
+        course_id: data.course_id || null
       });
     } catch (error) {
       console.error("Error fetching assessment:", error);
@@ -195,6 +203,8 @@ export default function AssessmentQuestionsPage({ params }: { params: Promise<{ 
     setShowDeleteConfirm(true);
   };
 
+
+
   // Delete a question
   const deleteQuestion = async () => {
     if (!questionToDelete) return;
@@ -231,47 +241,67 @@ export default function AssessmentQuestionsPage({ params }: { params: Promise<{ 
 
   // Toggle assessment editing mode
   const toggleEditAssessment = () => {
-    setIsEditingAssessment(!isEditingAssessment);
+    const newState = !isEditingAssessment;
+    setIsEditingAssessment(newState);
     
-    // Reset form if canceling edit
-    if (isEditingAssessment && assessment) {
+    // Reset form when opening the dialog
+    if (newState && assessment) {
       setAssessmentForm({
-        title: assessment.title,
-        description: assessment.description,
-        time_limit: assessment.time_limit
+        title: assessment.title || "",
+        description: assessment.description || "",
+        category: assessment.category || "",
+        difficulty: assessment.difficulty || "beginner",
+        time_limit: assessment.time_limit || 60,
+        thumbnail: assessment.thumbnail || "",
+        course_id: assessment.course_id ? Number(assessment.course_id) : null
       });
     }
+  };
+
+  const handleAssessmentChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setAssessmentForm({
+      ...assessmentForm,
+      [name]: value,
+    });
+  };
+  
+  const handleDifficultyChange = (value: string) => {
+    setAssessmentForm({
+      ...assessmentForm,
+      difficulty: value,
+    });
   };
   
   // Save assessment changes
   const saveAssessmentChanges = async () => {
-    if (!assessment) return;
-    
-    // Validate form
     if (!assessmentForm.title.trim()) {
       toast.error("Assessment title is required");
       return;
     }
 
-    if (!assessmentForm.description.trim()) {
-      toast.error("Assessment description is required");
-      return;
-    }
-    
     setIsSavingAssessment(true);
-    
     try {
+      // Ensure time_limit is a number
+      const timeLimit = typeof assessmentForm.time_limit === 'string' 
+        ? parseInt(assessmentForm.time_limit) 
+        : assessmentForm.time_limit;
+        
       const { error } = await supabase
         .from("assessments")
         .update({
           title: assessmentForm.title,
-          description: assessmentForm.description,
-          time_limit: assessmentForm.time_limit
+          description: assessmentForm.description || null,
+          category: assessmentForm.category || null,
+          difficulty: assessmentForm.difficulty || null,
+          time_limit: timeLimit || 60,
+          thumbnail: assessmentForm.thumbnail || null,
+          // We don't update course_id as it could break relationships
         })
         .eq("id", assessmentId);
-        
+
       if (error) throw error;
-      
+
       toast.success("Assessment updated successfully");
       fetchAssessment(); // Refresh assessment data
       setIsEditingAssessment(false);
@@ -459,140 +489,83 @@ export default function AssessmentQuestionsPage({ params }: { params: Promise<{ 
   };
 
   return (
-    <div className="container py-10 bg-gradient-to-b from-background to-background/95 text-foreground min-h-screen">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <Link href="/admin/dashboard" className="inline-flex items-center">
-            <Button variant="outline" size="sm" className="mr-2 hover:bg-primary/10 transition-colors duration-200">
-              <ArrowLeft className="h-4 w-4 mr-2" /> Back to Dashboard
-            </Button>
-          </Link>
-          <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80">
-            {assessment ? `Manage Questions: ${assessment.title}` : "Loading Assessment..."}
-          </h1>
-        </div>
-
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={fetchQuestions}
-            disabled={loading || isLoadingAction}
-            className="hover:bg-primary/10 transition-colors duration-200 rounded-lg shadow-md shadow-primary/5"
-          >
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Refresh
-          </Button>
-          <Button
-            onClick={handleAddQuestion}
-            size="sm"
-            disabled={loading || isLoadingAction}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200 rounded-lg shadow-md shadow-primary/5"
-          >
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Add Question
-          </Button>
-        </div>
+    <div className="space-y-4 sm:space-y-6 mb-8 sm:mb-10 sm:px-0 mx-2 md:mx-20">
+      {/* Back button */}
+      <div className="mb-4 sm:mb-6">
+        <Link
+          href="/admin/dashboard"
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Dashboard
+        </Link>
       </div>
 
-      {assessment && (
-        <Card className="mb-8 border-border bg-card text-card-foreground shadow-lg shadow-primary/5 rounded-xl overflow-hidden">
-          {/* Add a subtle top border accent */}
-          <div className="h-1 w-full bg-gradient-to-r from-primary to-primary/50"></div>
-          <CardHeader className="pb-3">
-            <div className="flex justify-between items-center">
-              <CardTitle>Assessment Details</CardTitle>
+      {/* Assessment Details Card */}
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-2 sm:gap-0">
+            <div>
+              <CardTitle className="text-lg sm:text-xl font-bold mb-1">{assessment?.title}</CardTitle>
+              <p className="text-sm text-muted-foreground">{assessment?.description || "No description provided"}</p>
+            </div>
+
+            {/* Edit button for assessment */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsEditingAssessment(true)}
+              disabled={loading}
+              className="hover:bg-muted flex items-center gap-1 self-start"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+              <span>Edit</span>
+            </Button>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 sm:gap-6 mt-4">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Time Limit:</span>
+              <Badge variant="secondary">{assessment?.time_limit || 60} minutes</Badge>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Questions:</span>
+              <Badge variant="secondary">{questions.length}</Badge>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+
+      {/* Questions Card */}
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
+            <CardTitle>Questions</CardTitle>
+            <div className="flex flex-wrap gap-2">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={toggleEditAssessment}
-                disabled={isSavingAssessment}
-                className="hover:bg-primary/10 transition-colors duration-200"
+                onClick={fetchQuestions}
+                disabled={loading || isSavingAssessment}
+                className="h-8"
               >
-                {isEditingAssessment ? (
-                  <>Cancel</>
-                ) : (
-                  <><Pencil className="h-4 w-4 mr-2" />Edit Assessment</>
-                )}
+                <RefreshCw className="mr-2 h-3.5 w-3.5" />
+                Refresh
+              </Button>
+              <Button
+                onClick={handleAddQuestion}
+                size="sm"
+                disabled={loading || isSavingAssessment}
+                className="h-8"
+              >
+                <PlusCircle className="mr-2 h-3.5 w-3.5" />
+                Add Question
               </Button>
             </div>
-          </CardHeader>
-          <CardContent>
-            {isEditingAssessment ? (
-              <div className="space-y-5">
-                <div className="grid gap-2">
-                  <Label htmlFor="title" className="text-sm font-medium text-muted-foreground">Title</Label>
-                  <Input
-                    id="title"
-                    value={assessmentForm.title}
-                    onChange={(e) => setAssessmentForm({ ...assessmentForm, title: e.target.value })}
-                    placeholder="Enter assessment title"
-                    className="focus-visible:ring-primary"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="time_limit" className="text-sm font-medium text-muted-foreground">Time Limit (minutes)</Label>
-                  <Input
-                    id="time_limit"
-                    type="number"
-                    min="1"
-                    max="180"
-                    value={assessmentForm.time_limit}
-                    onChange={(e) => setAssessmentForm({ ...assessmentForm, time_limit: parseInt(e.target.value) || 60 })}
-                    className="focus-visible:ring-primary"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="description" className="text-sm font-medium text-muted-foreground">Description</Label>
-                  <Textarea
-                    id="description"
-                    value={assessmentForm.description}
-                    onChange={(e) => setAssessmentForm({ ...assessmentForm, description: e.target.value })}
-                    placeholder="Enter assessment description"
-                    className="min-h-[100px] focus-visible:ring-primary"
-                  />
-                </div>
-                <div className="flex justify-end">
-                  <Button
-                    onClick={saveAssessmentChanges}
-                    disabled={isSavingAssessment}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-200"
-                  >
-                    {isSavingAssessment ? "Saving..." : "Save Changes"}
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h3 className="font-medium">Title</h3>
-                  <p>{assessment.title}</p>
-                </div>
-                <div>
-                  <h3 className="font-medium">Time Limit</h3>
-                  <p>{assessment.time_limit} minutes</p>
-                </div>
-                <div>
-                  <h3 className="font-medium">Description</h3>
-                  <p className="text-sm text-muted-foreground">{assessment.description}</p>
-                </div>
-                <div>
-                  <h3 className="font-medium">Questions</h3>
-                  <p>{questions.length} questions (of {assessment.number_of_questions} planned)</p>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Questions List */}
-      <Card className="border-border bg-card text-card-foreground shadow-lg shadow-primary/5 rounded-xl overflow-hidden">
-        {/* Add a subtle top border accent */}
-        <div className="h-1 w-full bg-gradient-to-r from-primary/80 to-primary/30"></div>
-        <CardHeader className="pb-3">
-          <CardTitle>Questions</CardTitle>
+          </div>
         </CardHeader>
+
         <CardContent>
           {loading ? (
             <div className="py-4 text-center">Loading questions...</div>
@@ -605,72 +578,79 @@ export default function AssessmentQuestionsPage({ params }: { params: Promise<{ 
               {questions.map((question, index) => (
                 <div
                   key={question.id}
-                  className="border border-border rounded-lg p-5 hover:bg-muted/40 transition-all duration-200 hover:shadow-md hover:shadow-primary/5"
+                  className="border border-border rounded-lg p-3 sm:p-5 hover:bg-muted/40 transition-all duration-200 hover:shadow-md hover:shadow-primary/5"
                 >
-                  <div className="flex justify-between items-start">
+                  <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-3 sm:gap-0">
                     <div className="flex-1">
                       <div className="flex flex-wrap items-center gap-2 mb-3">
-                        <Badge variant="outline" className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-primary/10 text-primary border-primary/20">{index + 1}</Badge>
+                        <Badge variant="outline" className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-primary/10 text-primary border-primary/20">
+                          {index + 1}
+                        </Badge>
                         <Badge variant="secondary" className="px-2.5 py-0.5 text-xs font-medium rounded-full">
-                          {question.question_type === "multiple_choice"
-                            ? "Multiple Choice"
-                            : "True/False"}
+                          {question.question_type === 'multiple_choice'
+                            ? 'Multiple Choice'
+                            : 'True/False'}
                         </Badge>
                         {question.difficulty && (
                           <Badge
                             variant="default"
                             className={`
-                              ${question.difficulty === "easy" ? "bg-green-800 hover:bg-green-900" : ""}
-                              ${question.difficulty === "medium" ? "bg-yellow-800 hover:bg-yellow-900" : ""}
-                              ${question.difficulty === "hard" ? "bg-red-800 hover:bg-red-900" : ""}
+                              ${question.difficulty === 'easy' ? 'bg-green-800 hover:bg-green-900' : ''}
+                              ${question.difficulty === 'medium' ? 'bg-yellow-800 hover:bg-yellow-900' : ''}
+                              ${question.difficulty === 'hard' ? 'bg-red-800 hover:bg-red-900' : ''}
                             `}
                           >
                             {question.difficulty.charAt(0).toUpperCase() + question.difficulty.slice(1)}
                           </Badge>
                         )}
                       </div>
-                      <h4 className="font-medium text-lg">{question.question_text}</h4>
+                      <h4 className="font-medium text-base sm:text-lg">{question.question_text}</h4>
                       {question.description && (
                         <p className="text-sm text-muted-foreground mt-1 mb-2">
                           {question.description}
                         </p>
                       )}
-                      <div className="mt-3 space-y-2">
+                      <div className="mt-3 space-y-2 text-sm">
                         {question.options?.map((option) => (
                           <div
                             key={option.id}
-                            className={`px-4 py-2 text-sm rounded-md transition-all duration-200 ${option.is_correct
-                              ? "bg-green-950/70 border border-green-800 text-green-300 hover:bg-green-950"
-                              : "bg-gray-800/60 border border-gray-700 text-gray-300 hover:bg-gray-800"
-                              }`}
+                            className={`px-3 sm:px-4 py-2 text-xs sm:text-sm rounded-md transition-all duration-200 ${
+                              option.is_correct
+                                ? 'bg-green-950/70 border border-green-800 text-green-300 hover:bg-green-950'
+                                : 'bg-gray-800/60 border border-gray-700 text-gray-300 hover:bg-gray-800'
+                            }`}
                           >
                             <div className="flex items-center justify-between">
-                              <span>{option.option_text}</span>
-                              {option.is_correct && <span className="flex items-center justify-center w-5 h-5 rounded-full bg-green-500/20 text-green-300">✓</span>}
+                              <span className="break-words pr-2">{option.option_text}</span>
+                              {option.is_correct && (
+                                <span className="flex-shrink-0 flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-green-500/20 text-green-300">
+                                  ✓
+                                </span>
+                              )}
                             </div>
                           </div>
                         ))}
                       </div>
                     </div>
 
-                    <div className="flex space-x-2 ml-4">
+                    <div className="flex space-x-2 sm:ml-4 self-end sm:self-start">
                       <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => handleEditQuestion(question)}
-                        disabled={isLoadingAction}
-                        className="rounded-full hover:bg-primary/10 hover:text-primary transition-colors duration-200"
+                        disabled={isSavingAssessment}
+                        className="h-8 w-8 rounded-full hover:bg-primary/10 hover:text-primary transition-colors duration-200"
                       >
-                        <Edit className="h-4 w-4" />
+                        <Edit className="h-3.5 w-3.5" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => confirmDelete(question.id)}
-                        disabled={isLoadingAction}
-                        className="rounded-full hover:bg-red-500/10 hover:text-red-400 transition-colors duration-200"
+                        disabled={isSavingAssessment}
+                        className="h-8 w-8 rounded-full hover:bg-red-500/10 hover:text-red-400 transition-colors duration-200"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
                   </div>
@@ -683,15 +663,15 @@ export default function AssessmentQuestionsPage({ params }: { params: Promise<{ 
 
       {/* Question Dialog */}
       <Dialog open={showQuestionDialog} onOpenChange={setShowQuestionDialog}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle>
-              {isEditing ? "Edit Question" : "Add New Question"}
+              {isEditing ? 'Edit Question' : 'Add New Question'}
             </DialogTitle>
             <DialogDescription>
               {isEditing
-                ? "Update the question details below."
-                : "Create a new question by filling out the form below."}
+                ? 'Update the question details below.'
+                : 'Create a new question by filling out the form below.'}
             </DialogDescription>
           </DialogHeader>
 
@@ -727,7 +707,7 @@ export default function AssessmentQuestionsPage({ params }: { params: Promise<{ 
               <Label htmlFor="question_type">Question Type</Label>
               <Select
                 value={questionForm.question_type}
-                onValueChange={(value) => handleSelectChange("question_type", value)}
+                onValueChange={(value) => handleSelectChange('question_type', value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select question type" />
@@ -747,7 +727,7 @@ export default function AssessmentQuestionsPage({ params }: { params: Promise<{ 
               <Label htmlFor="difficulty">Difficulty</Label>
               <Select
                 value={questionForm.difficulty}
-                onValueChange={(value) => handleSelectChange("difficulty", value)}
+                onValueChange={(value) => handleSelectChange('difficulty', value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select difficulty" />
@@ -764,16 +744,18 @@ export default function AssessmentQuestionsPage({ params }: { params: Promise<{ 
 
             {/* Options */}
             <div className="grid gap-2">
-              <div className="flex justify-between items-center">
-                <Label>Answer Options *</Label>
-                {questionForm.question_type === "multiple_choice" && (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-2 sm:gap-0">
+                <Label>Options {questionForm.question_type === 'multiple_choice' ? '(at least 2)' : ''}</Label>
+                {questionForm.question_type === 'multiple_choice' && (
                   <Button
+                    type="button"
                     variant="outline"
                     size="sm"
                     onClick={addOption}
                     disabled={questionForm.options.length >= 8}
-                    type="button"
+                    className="h-8 flex items-center self-start sm:self-auto"
                   >
+                    <PlusCircle className="mr-1 h-3.5 w-3.5" />
                     Add Option
                   </Button>
                 )}
@@ -784,38 +766,38 @@ export default function AssessmentQuestionsPage({ params }: { params: Promise<{ 
 
               <div className="space-y-3">
                 {questionForm.options.map((option, index) => (
-                  <div key={index} className="flex items-start space-x-3">
-                    <div className="flex-1">
+                  <div key={index} className="flex flex-col sm:flex-row items-start gap-2 sm:gap-3">
+                    <div className="flex-1 w-full">
                       <Input
-                        value={option.option_text}
-                        onChange={(e) =>
-                          handleOptionChange(index, "option_text", e.target.value)
-                        }
                         placeholder={`Option ${index + 1}`}
-                        disabled={questionForm.question_type === "true_false"}
+                        value={option.option_text}
+                        onChange={(e) => handleOptionChange(index, 'option_text', e.target.value)}
+                        disabled={
+                          questionForm.question_type === 'true_false' &&
+                          (option.option_text === 'True' || option.option_text === 'False')
+                        }
+                        className="mb-1"
                       />
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="flex items-center space-x-2">
+
+                    <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-3 sm:gap-2">
+                      <div className="flex items-center gap-2">
                         <Switch
                           checked={option.is_correct}
-                          onCheckedChange={(checked) =>
-                            handleOptionChange(index, "is_correct", checked)
-                          }
-                          id={`correct-${index}`}
+                          onCheckedChange={(checked) => handleOptionChange(index, 'is_correct', checked)}
                         />
-                        <Label htmlFor={`correct-${index}`} className="text-sm cursor-pointer">
-                          Correct
-                        </Label>
+                        <span className="text-sm">Correct</span>
                       </div>
-                      {questionForm.question_type === "multiple_choice" && questionForm.options.length > 2 && (
+
+                      {questionForm.question_type === 'multiple_choice' && questionForm.options.length > 2 && (
                         <Button
+                          type="button"
                           variant="ghost"
                           size="icon"
                           onClick={() => removeOption(index)}
-                          type="button"
+                          className="h-8 w-8 rounded-full hover:bg-red-500/10 hover:text-red-400"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3.5 w-3.5" />
                         </Button>
                       )}
                     </div>
@@ -877,7 +859,135 @@ export default function AssessmentQuestionsPage({ params }: { params: Promise<{ 
         </DialogContent>
       </Dialog>
 
-      {/* We've removed the Assessment Edit Dialog as requested */}
+      {/* Assessment Edit Dialog */}
+      <Dialog open={isEditingAssessment} onOpenChange={toggleEditAssessment}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              Edit Assessment
+            </DialogTitle>
+            <DialogDescription>
+              Update assessment details below.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-4 py-4">
+            {/* Title */}
+            <div className="grid gap-2">
+              <Label htmlFor="title">Title *</Label>
+              <Input
+                id="title"
+                name="title"
+                value={assessmentForm.title}
+                onChange={handleAssessmentChange}
+                placeholder="Enter assessment title"
+              />
+            </div>
+
+            {/* Description */}
+            <div className="grid gap-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                name="description"
+                value={assessmentForm.description}
+                onChange={handleAssessmentChange}
+                placeholder="Enter assessment description"
+                className="min-h-[100px]"
+              />
+            </div>
+
+            {/* Category */}
+            <div className="grid gap-2">
+              <Label htmlFor="category">Category</Label>
+              <Input
+                id="category"
+                name="category"
+                value={assessmentForm.category}
+                onChange={handleAssessmentChange}
+                placeholder="E.g., Web Development, AI, Data Science"
+              />
+            </div>
+
+            {/* Difficulty */}
+            <div className="grid gap-2">
+              <Label htmlFor="difficulty">Difficulty</Label>
+              <Select
+                value={assessmentForm.difficulty}
+                onValueChange={handleDifficultyChange}
+              >
+                <SelectTrigger id="difficulty">
+                  <SelectValue placeholder="Select difficulty" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="beginner">Beginner</SelectItem>
+                  <SelectItem value="intermediate">Intermediate</SelectItem>
+                  <SelectItem value="advanced">Advanced</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Time Limit */}
+            <div className="grid gap-2">
+              <Label htmlFor="time_limit">Time Limit (minutes)</Label>
+              <Input
+                id="time_limit"
+                name="time_limit"
+                type="number"
+                min="1"
+                max="180"
+                value={assessmentForm.time_limit}
+                onChange={(e) => {
+                  const parsedValue = e.target.value ? parseInt(e.target.value) : 60;
+                  setAssessmentForm({
+                    ...assessmentForm, 
+                    time_limit: parsedValue
+                  });
+                }}
+                placeholder="Time in minutes"
+              />
+            </div>
+
+            {/* Thumbnail URL */}
+            <div className="grid gap-2">
+              <Label htmlFor="thumbnail">Thumbnail URL</Label>
+              <Input
+                id="thumbnail"
+                name="thumbnail"
+                value={assessmentForm.thumbnail}
+                onChange={handleAssessmentChange}
+                placeholder="https://example.com/thumbnail.jpg"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsEditingAssessment(false)}
+              disabled={isSavingAssessment}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={saveAssessmentChanges}
+              disabled={isSavingAssessment}
+            >
+              {isSavingAssessment ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Save Changes
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
     </div>
   );

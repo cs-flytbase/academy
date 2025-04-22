@@ -66,7 +66,7 @@ export function CourseCard({
       onMouseMove={handleMouseMove}
     >
       {/* BORDER with gradient from top to bottom */}
-      <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-[#000000] via-[#1A6ED0] to-[#1A6ED0] p-[1.5px]">
+      <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-[#1A6ED0] via-[#1A6ED0] to-[#000000] p-[1.5px]">
         {/* INNER CARD */}
         <Card className="h-full rounded-3xl overflow-hidden bg-gradient-to-b from-[#14171b] to-[#1a1e24] border-0 p-0 flex flex-col ">
           {/* INTERACTIVE GLOW EFFECT */}

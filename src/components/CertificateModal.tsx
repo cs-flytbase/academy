@@ -19,7 +19,7 @@ const CertificateModal = ({
   onClose,
   defaultEmail = "",
   defaultName = "",
-  courseId,
+  assessmentId, // Changed from courseId to assessmentId to match the database schema
   courseTitle,
   onSuccess,
 }) => {
@@ -73,7 +73,7 @@ const CertificateModal = ({
         email: email,
         name: name,
         course: courseTitle,
-        courseID: courseId,
+        assessmentID: assessmentId, // Changed from courseID to assessmentID
         userID: userData.user.id,
       };
 
@@ -108,7 +108,7 @@ const CertificateModal = ({
       // Generate a new certificate record in the database
       const certData = {
         user_id: userData.user.id,
-        course_id: courseId,
+        assessment_id: assessmentId, // Changed from course_id to assessment_id to match the DB schema
         created_at: new Date().toISOString(),
         url: responseData.url || "",
         name: name,
@@ -116,21 +116,25 @@ const CertificateModal = ({
       };
 
       // Try to insert the certificate record
-      //   try {
-      //     const { data: newCert, error: createError } = await supabase
-      //       .from("certificate_user")
-      //       .insert(certData)
-      //       .select()
-      //       .single();
+      try {
+        const { data: newCert, error: createError } = await supabase
+          .from("certificate_user")
+          .insert(certData)
+          .select()
+          .single();
 
-      //     if (createError) {
-      //       console.error("Error creating certificate record:", createError);
-      //       // Don't throw here - we already sent the webhook request successfully
-      //     }
-      //   } catch (dbError) {
-      //     console.error("Database error:", dbError);
-      //     // The webhook was still successful, so we'll continue
-      //   }
+        if (createError) {
+          console.error("Error creating certificate record:", createError);
+          // Don't throw here - we already sent the webhook request successfully
+        }
+        // Pass the certificate data to the onSuccess callback
+        if (onSuccess && newCert) {
+          onSuccess(newCert);
+        }
+      } catch (dbError) {
+        console.error("Database error:", dbError);
+        // The webhook was still successful, so we'll continue
+      }
 
       // Show success message
       alert(

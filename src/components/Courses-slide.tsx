@@ -59,7 +59,7 @@ const CourseCertificateSwitcher = () => {
             title: course.title,
             description: course.description || "Learn new skills with this course.",
             thumbnail: course.thumbnail || "/placeholder-course.jpg",
-            duration: formatDuration(calculateEstimatedDuration(course.video_count || 0)),
+            duration: course.watch_hour || formatDuration(calculateEstimatedDuration(course.video_count || 0)),
             videoCount: course.video_count || 0,
             level: "All Levels" // Not in schema, using default
           }));

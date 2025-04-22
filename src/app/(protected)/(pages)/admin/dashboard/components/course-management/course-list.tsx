@@ -60,6 +60,15 @@ const CourseList: React.FC<CourseListProps> = ({
                     <FileVideo className="h-3 w-3" /> {course.video_count} videos
                   </Badge>
                 )}
+                {course.watch_hour && (
+                  <Badge variant="outline" className="flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
+                      <circle cx="12" cy="12" r="10"/>
+                      <polyline points="12 6 12 12 16 14"/>
+                    </svg> 
+                    {course.watch_hour}
+                  </Badge>
+                )}
               </div>
               <h4 className="font-medium">{course.title}</h4>
               {course.description && (

@@ -18,6 +18,7 @@ export interface Course {
   created_at?: string;
   playlist_id?: string;
   video_count?: number;
+  watch_hour?: string;
 }
 
 export interface Video {

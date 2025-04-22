@@ -506,10 +506,6 @@ const DashboardPage = () => {
             </p>
           </CardContent>
         </Card>
-
-       
-        
- 
         </div>
 
         {/* Main Dashboard Content */}
@@ -772,8 +768,6 @@ const DashboardPage = () => {
         </div>
       </div>
     </div>
-    </div>
-    
   );
 };
 

@@ -26,6 +26,7 @@ interface Course {
   video_count: number;
   playlist_id: string;
   created_at: string;
+  watch_hour: string | null;
 }
 
 interface User {
@@ -315,7 +316,7 @@ const UserPage = () => {
                 description={course.description}
                 isEnrolled={enrolledCourses.includes(course.id)}
                 numVideos={course.video_count}
-                duration="3h 45m"
+                duration={course.watch_hour || "3h 45m"}
                 thumbnailSrc={course.thumbnail || "https://placehold.co/600x400/3730a3/ffffff?text=Course"}
                 wishlisted={wishlist.includes(course.id)}
                 onEnroll={(e) => handleEnroll(e, course.id, course.title)}

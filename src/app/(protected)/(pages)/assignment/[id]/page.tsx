@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { TestProvider, useTest } from "@/contexts/TestContext";
+import { useTest } from "@/contexts/TestContext";
 import { Clock, BarChart, ChevronLeft, Play, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { NextPage } from "next";
@@ -129,7 +129,6 @@ const AssignmentDetail: NextPage = () => {
   };
 
   return (
-    <TestProvider>
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-12 max-w-4xl">
           <Link href="/assignment" className="cursor-pointer">
@@ -142,114 +141,150 @@ const AssignmentDetail: NextPage = () => {
             </Button>
           </Link>
 
-          <Card className="overflow-hidden border border-border/50 shadow-sm">
-            <div
-              className="h-64 w-full bg-cover bg-center border-b border-border/10"
-              style={{
-                backgroundImage: `url(${
-                  assignment.thumbnail ||
-                  "https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=2070&auto=format&fit=crop"
-                })`,
-              }}
-            />
+          <Card className="overflow-hidden border border-border/50 shadow-lg bg-gradient-to-b from-background to-secondary/20">
 
-            <CardHeader>
-              <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+            <CardHeader className="pb-6 pt-8 px-6">
+              <div className="flex flex-col gap-6">
+                <div className="flex flex-wrap gap-2 mb-1">
+                  <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                    Certificate Assessment
+                  </span>
+                  <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground border border-border/50">
+                    {assignment.category || "General"}
+                  </span>
+                  <span
+                    className={`text-xs font-medium px-3 py-1.5 rounded-full text-white border border-white/10 ${getDifficultyColor()}`}
+                  >
+                    {assignment.difficulty || "Standard"}
+                  </span>
+                </div>
+                
                 <div>
-                  <div className="flex gap-2 mb-2">
-                    <span className="text-xs font-medium px-2 py-1 rounded-full bg-secondary text-secondary-foreground">
-                      {assignment.category || "General"}
-                    </span>
-                    <span
-                      className={`text-xs font-medium px-2 py-1 rounded-full text-white ${getDifficultyColor()}`}
-                    >
-                      {assignment.difficulty || "N/A"}
-                    </span>
-                  </div>
-                  <CardTitle className="text-2xl">{assignment.title}</CardTitle>
-                  <CardDescription className="mt-1">
+                  <CardTitle className="text-3xl font-bold">{assignment.title}</CardTitle>
+                  <CardDescription className="mt-3 text-base max-w-2xl">
                     {assignment.description}
                   </CardDescription>
                 </div>
-
-                <Button
-                  onClick={handleStartTest}
-                  className="cursor-pointer w-full md:w-auto shadow-sm min-w-36 py-6 subtle-transitions"
-                  disabled={isLoading || assignment.questionCount === 0}
-                >
-                  {isLoading ? (
-                    <div className="flex items-center">
-                      <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                      Preparing Test...
-                    </div>
-                  ) : assignment.questionCount === 0 ? (
-                    <div className="flex items-center">
-                      <AlertCircle className="mr-2 h-4 w-4" />
-                      No Questions Available
-                    </div>
-                  ) : (
-                    <div className="flex items-center">
-                      <Play className="mr-2 h-4 w-4" />
-                      Start Test
-                    </div>
-                  )}
-                </Button>
               </div>
             </CardHeader>
 
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="flex flex-col space-y-4">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Clock className="h-5 w-5" />
-                    <div>
-                      <p className="font-medium text-foreground">Time Limit</p>
-                      <p className="text-sm">
-                        {assignment.timeLimit
-                          ? `${assignment.timeLimit} minutes`
-                          : "No limit"}
-                      </p>
+            <CardContent className="px-6 pb-8 pt-0">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+                <div className="md:col-span-3 space-y-6">
+                  <div className="bg-card/40 border border-border/50 rounded-xl p-5 shadow-sm">
+                    <h3 className="font-semibold mb-4 text-lg flex items-center">
+                      <BarChart className="h-5 w-5 mr-2 text-blue-400" />
+                      Test Overview
+                    </h3>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="bg-background/60 rounded-lg p-4 border border-border/40 flex flex-col">
+                        <span className="text-sm text-muted-foreground">Questions</span>
+                        <span className="text-2xl font-semibold mt-1">{assignment.questionCount}</span>
+                        <span className="text-xs text-muted-foreground mt-1">Complete all to pass</span>
+                      </div>
+                      
+                      <div className="bg-background/60 rounded-lg p-4 border border-border/40 flex flex-col">
+                        <span className="text-sm text-muted-foreground">Time Limit</span>
+                        <span className="text-2xl font-semibold mt-1">
+                          {assignment.timeLimit ? `${assignment.timeLimit} min` : "No limit"}
+                        </span>
+                        <span className="text-xs text-muted-foreground mt-1">Plan your time accordingly</span>
+                      </div>
                     </div>
                   </div>
-
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <BarChart className="h-5 w-5" />
-                    <div>
-                      <p className="font-medium text-foreground">Questions</p>
-                      <p className="text-sm">
-                        {assignment.questionCount} questions to complete
-                      </p>
-                    </div>
+                  
+                  <div className="bg-card/40 border border-border/50 rounded-xl p-5 shadow-sm">
+                    <h3 className="font-semibold mb-4 text-lg flex items-center">
+                      <Clock className="h-5 w-5 mr-2 text-blue-400" />
+                      Test Instructions
+                    </h3>
+                    <ul className="space-y-3 text-muted-foreground">
+                      <li className="flex items-start">
+                        <div className="bg-blue-500/10 text-blue-400 rounded-full p-1 mr-2 mt-0.5">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </div>
+                        You will have {assignment.timeLimit ? `${assignment.timeLimit} minutes` : "no time limit"} to complete this test.
+                      </li>
+                      <li className="flex items-start">
+                        <div className="bg-blue-500/10 text-blue-400 rounded-full p-1 mr-2 mt-0.5">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </div>
+                        The test will automatically submit when the time is up.
+                      </li>
+                      <li className="flex items-start">
+                        <div className="bg-blue-500/10 text-blue-400 rounded-full p-1 mr-2 mt-0.5">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </div>
+                        Do not refresh or leave the page during the test.
+                      </li>
+                      <li className="flex items-start">
+                        <div className="bg-blue-500/10 text-blue-400 rounded-full p-1 mr-2 mt-0.5">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </div>
+                        Make sure to save your answers before moving to the next question.
+                      </li>
+                      <li className="flex items-start">
+                        <div className="bg-blue-500/10 text-blue-400 rounded-full p-1 mr-2 mt-0.5">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </div>
+                        You can review your answers before submitting.
+                      </li>
+                    </ul>
                   </div>
                 </div>
-
-                <div className="bg-secondary/50 rounded-lg p-4 border border-border/50">
-                  <h3 className="font-medium mb-2">Test Instructions</h3>
-                  <ul className="text-sm space-y-2 text-muted-foreground">
-                    <li>
-                      • You will have{" "}
-                      {assignment.timeLimit
-                        ? `${assignment.timeLimit} minutes`
-                        : "no time limit"}{" "}
-                      to complete this test.
-                    </li>
-                    <li>
-                      • The test will automatically submit when the time is up.
-                    </li>
-                    <li>• Do not refresh or leave the page during the test.</li>
-                    <li>
-                      • Make sure to save your answers before moving to the next
-                      question.
-                    </li>
-                    <li>• You can review your answers before submitting.</li>
-                  </ul>
+                
+                <div className="md:col-span-2">
+                  <div className="bg-blue-500/5 border border-blue-500/20 rounded-xl p-6 sticky top-6 flex flex-col gap-6">
+                    <div>
+                      <h3 className="font-semibold text-lg mb-2">Ready to start?</h3>
+                      <p className="text-sm text-muted-foreground">Once you begin, the timer will start and you'll need to complete all questions.</p>
+                    </div>
+                    
+                    <Button
+                      onClick={handleStartTest}
+                      size="lg"
+                      className="w-full py-6 text-base font-medium bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 shadow-md"
+                      disabled={isLoading || assignment.questionCount === 0}
+                    >
+                      {isLoading ? (
+                        <div className="flex items-center justify-center">
+                          <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                          Preparing Test...
+                        </div>
+                      ) : assignment.questionCount === 0 ? (
+                        <div className="flex items-center justify-center">
+                          <AlertCircle className="mr-2 h-5 w-5" />
+                          No Questions Available
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center">
+                          <Play className="mr-2 h-5 w-5" />
+                          Start Test Now
+                        </div>
+                      )}
+                    </Button>
+                    
+                    <div className="text-xs text-center text-muted-foreground">
+                      You can pause the test at any time, but the timer will continue running.
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
-    </TestProvider>
   );
 };
 

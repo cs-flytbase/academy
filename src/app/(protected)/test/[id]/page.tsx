@@ -65,6 +65,8 @@ interface Assignment {
   timeLimit: number | null;
   questions: Question[];
   thumbnail?: string;
+  courseId?: number; // Course ID for reference
+  // We directly use id as assessment_id for certificates
 }
 
 // Interface for test results
@@ -87,6 +89,16 @@ interface CertificateFormData {
   fullName: string;
   designation: string;
   email: string;
+}
+
+// Helper function to shuffle array (outside component to avoid hook rule violations)
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
 }
 
 const TestPage = () => {
@@ -129,6 +141,14 @@ const TestPage = () => {
   const [existingCertificate, setExistingCertificate] = useState(null);
   // Get the current question
   const currentQuestion = assignment?.questions[currentQuestionIndex];
+  
+  // Use React.useMemo to ensure consistent option order during renders
+  const shuffledOptions = React.useMemo(() => {
+    if (currentQuestion?.type === "multiple-choice" && currentQuestion?.options) {
+      return shuffleArray(currentQuestion.options);
+    }
+    return [];
+  }, [currentQuestion?.id]); // Re-shuffle only when question changes
   const checkExistingCertificate = async () => {
     try {
       const {
@@ -765,14 +785,19 @@ const TestPage = () => {
         );
         console.log("course", assessmentData.course_id);
         setCourseId(assessmentData.course_id);
-        // 3. Set the assignment state with all the data
+        // Store courseId in localStorage as a backup
+        if (assessmentData.course_id) {
+          localStorage.setItem('current_course_id', assessmentData.course_id.toString());
+        }
+        // 3. Set the assignment state with all the data (with randomized questions)
         setAssignment({
           id: assessmentData.id,
           title: assessmentData.title,
           description: assessmentData.description,
           timeLimit: assessmentData.time_limit,
           thumbnail: assessmentData.thumbnail,
-          questions: processedQuestions,
+          questions: shuffleArray(processedQuestions), // Shuffle questions for randomization
+          courseId: assessmentData.course_id, // Add courseId to assignment
         });
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -1313,8 +1338,18 @@ const TestPage = () => {
                     certificate.
                   </p>
                   <Button
-                    onClick={() => router.push(`/certificate/${courseId}`)}
-                    // onClick={generateCertificate}
+                    onClick={() => {
+                      // Use assessment_id for certificate generation instead of course_id
+                      // The certificate system is linked to assessments, not courses
+                      const assessmentId = assignment?.id;
+                      console.log('Using assessment ID for certificate:', assessmentId);
+                      if (assessmentId) {
+                        // Include information about user name and assessment title for the certificate
+                        router.push(`/certificate/${assessmentId}`);
+                      } else {
+                        toast.error('Assessment ID not found');
+                      }
+                    }}
                     className="bg-green-600 hover:bg-green-700"
                   >
                     <Award className="mr-2 h-5 w-5" />
@@ -1523,6 +1558,7 @@ const TestPage = () => {
     );
   }
 
+  
   // Render question with appropriate input type
   const renderQuestionInput = () => {
     if (!currentQuestion) return null;
@@ -1535,8 +1571,8 @@ const TestPage = () => {
             onValueChange={handleAnswerChange}
             className="space-y-4 mt-6"
           >
-            {currentQuestion.options && currentQuestion.options.length > 0 ? (
-              currentQuestion.options.map((option) => (
+            {shuffledOptions && shuffledOptions.length > 0 ? (
+              shuffledOptions.map((option) => (
                 <div
                   key={option.id}
                   className="flex items-start space-x-3 p-4 rounded-lg border border-border/50 hover:border-primary/50 hover:bg-accent/50 transition-colors"
@@ -1835,16 +1871,22 @@ const TestPage = () => {
         <CertificateModal
           isOpen={showCertModal}
           onClose={() => setShowCertModal(false)}
-          defaultEmail={user?.email || ""}
+          defaultEmail={currentUser?.email || ""}
           defaultName={
-            user?.profile?.full_name ||
-            user?.profile?.display_name ||
-            user?.user_metadata?.full_name ||
+            currentUser?.user_metadata?.name ||
+            currentUser?.user_metadata?.full_name ||
             ""
           }
-          courseId={courseId}
-          courseTitle={courseTitle}
-          onSuccess={handleCertificateSuccess}
+          assessmentId={Number(id)}
+          courseTitle={assignment?.title || ""}
+          onSuccess={(certificate) => {
+            setShowCertModal(false);
+            setExistingCertificate(certificate);
+            // Success message
+            toast.success("Certificate Created", {
+              description: "Your certificate has been generated successfully!",
+            });
+          }}
         />
       )}
     </div>

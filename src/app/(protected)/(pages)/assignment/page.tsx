@@ -108,7 +108,7 @@ const Index = () => {
                 courseTitle={assignment.title}
                 numQuestions={20}
                 duration={assignment.timeLimit ? `${assignment.timeLimit} min` : '45 min'}
-                difficulty={assignment.difficulty ?? 'Intermediate'}
+                difficulty={assignment.difficulty || 'Standard'}
                 onTakeTest={() => router.push(`/assignment/${assignment.id}`)}
                 onDetails={() => router.push(`/assignment/${assignment.id}`)}
               />
