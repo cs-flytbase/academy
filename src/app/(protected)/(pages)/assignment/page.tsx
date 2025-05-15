@@ -18,17 +18,19 @@ interface Assignment {
   category: string | null; // mapped from category (can be null)
   courseId: number; // mapped from course_id
   createdAt: string; // mapped from created_at
+  questionCount?: number; // number of questions in the assessment
 }
 
 const Index = () => {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [questionCounts, setQuestionCounts] = useState<Record<number, number>>({});
   const router = useRouter();
+  const supabase = createClient();
 
   useEffect(() => {
     const fetchAssignments = async () => {
-      const supabase = createClient();
       const { data, error } = await supabase.from("assessments").select("*");
       console.log("assignments:", data);
 
@@ -50,12 +52,39 @@ const Index = () => {
           })
         );
         setAssignments(mappedData);
+        
+        // Fetch question counts for each assessment
+        fetchQuestionCounts(mappedData);
       }
-      setLoading(false);
     };
 
     fetchAssignments();
   }, []);
+  
+  // Fetch the number of questions for each assessment
+  const fetchQuestionCounts = async (assessments: Assignment[]) => {
+    try {
+      const counts: Record<number, number> = {};
+      
+      // Fetch questions for all assessments
+      for (const assessment of assessments) {
+        const { data, error } = await supabase
+          .from("questions")
+          .select("id")
+          .eq("assessment_id", assessment.id);
+          
+        if (error) throw error;
+        
+        counts[assessment.id] = data?.length || 0;
+      }
+      
+      setQuestionCounts(counts);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching question counts:", error);
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -106,7 +135,7 @@ const Index = () => {
             <div key={assignment.id} className="animate-fade-in w-full ">
               <CertificateAssessmentCard
                 courseTitle={assignment.title}
-                numQuestions={20}
+                numQuestions={questionCounts[assignment.id] || 0}
                 duration={assignment.timeLimit ? `${assignment.timeLimit} min` : '45 min'}
                 difficulty={assignment.difficulty || 'Standard'}
                 onTakeTest={() => router.push(`/assignment/${assignment.id}`)}
@@ -114,7 +143,7 @@ const Index = () => {
               />
                {/* <CertificateAssessmentCard
                 courseTitle={assignment.title}
-                numQuestions={20}
+                numQuestions={questionCounts[assignment.id] || 0}
                 duration={assignment.timeLimit ? `${assignment.timeLimit} min` : '45 min'}
                 difficulty={assignment.difficulty ?? 'Intermediate'}
                 onTakeTest={() => router.push(`/assignment/${assignment.id}`)}
