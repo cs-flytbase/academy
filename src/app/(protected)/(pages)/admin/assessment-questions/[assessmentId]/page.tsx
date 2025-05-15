@@ -18,7 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 // Question type options
 const questionTypes = [
-  { value: "multiple_choice", label: "Multiple Choice" },
+  { value: "multiple-choice", label: "Multiple Choice" },
   { value: "true_false", label: "True/False" },
 ];
 
@@ -72,7 +72,7 @@ export default function AssessmentQuestionsPage({ params }: { params: Promise<{ 
   }>({
     question_text: "",
     description: "",
-    question_type: "multiple_choice",
+    question_type: "multiple-choice",
     difficulty: "medium",
     options: [
       { option_text: "", is_correct: false },
@@ -161,7 +161,7 @@ export default function AssessmentQuestionsPage({ params }: { params: Promise<{ 
     setQuestionForm({
       question_text: "",
       description: "",
-      question_type: "multiple_choice",
+      question_type: "multiple-choice",
       difficulty: "medium",
       options: [
         { option_text: "", is_correct: false },
@@ -338,7 +338,7 @@ export default function AssessmentQuestionsPage({ params }: { params: Promise<{ 
           { option_text: "False", is_correct: false },
         ],
       }));
-    } else if (name === "question_type" && value === "multiple_choice" && questionForm.options.length < 3) {
+    } else if (name === "question_type" && value === "multiple-choice" && questionForm.options.length < 3) {
       // If changing from true/false to multiple choice, add more options
       setQuestionForm((prev) => ({
         ...prev,
@@ -587,7 +587,7 @@ export default function AssessmentQuestionsPage({ params }: { params: Promise<{ 
                           {index + 1}
                         </Badge>
                         <Badge variant="secondary" className="px-2.5 py-0.5 text-xs font-medium rounded-full">
-                          {question.question_type === 'multiple_choice'
+                          {question.question_type === 'multiple-choice'
                             ? 'Multiple Choice'
                             : 'True/False'}
                         </Badge>
@@ -745,8 +745,8 @@ export default function AssessmentQuestionsPage({ params }: { params: Promise<{ 
             {/* Options */}
             <div className="grid gap-2">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-2 sm:gap-0">
-                <Label>Options {questionForm.question_type === 'multiple_choice' ? '(at least 2)' : ''}</Label>
-                {questionForm.question_type === 'multiple_choice' && (
+                <Label>Options {questionForm.question_type === 'multiple-choice' ? '(at least 2)' : ''}</Label>
+                {questionForm.question_type === 'multiple-choice' && (
                   <Button
                     type="button"
                     variant="outline"
@@ -789,7 +789,7 @@ export default function AssessmentQuestionsPage({ params }: { params: Promise<{ 
                         <span className="text-sm">Correct</span>
                       </div>
 
-                      {questionForm.question_type === 'multiple_choice' && questionForm.options.length > 2 && (
+                      {questionForm.question_type === 'multiple-choice' && questionForm.options.length > 2 && (
                         <Button
                           type="button"
                           variant="ghost"
