@@ -334,7 +334,7 @@ const Layout = ({ children }: LayoutProps) => {
       title: "Learn",
       links: [
         { name: "Courses", href: "/course" },
-        { name: "Tutorials", href: "/tutorials" },
+        // { name: "Tutorials", href: "/tutorials" },
         { name: "Docs", href: "https://docs.flytbase.com/" },
         { name: "Blogs", href: "https://www.flytbase.com/blog", external: true },
       ],
@@ -342,19 +342,19 @@ const Layout = ({ children }: LayoutProps) => {
     {
       title: "Support",
       links: [
-        { name: "Help Center", href: "/help" },
+        { name: "Help Center", href: "https://www.flytbase.com/contact" },
         { name: "Contact Us", href: "https://www.flytbase.com/contact" },
-        { name: "FAQ", href: "/faq" },
+        // { name: "FAQ", href: "/faq" },
         { name: "Community", href: "/community" },
       ],
     },
     {
       title: "Company",
       links: [
-        { name: "About Us", href: "/about" },
-        { name: "Careers", href: "/careers" },
-        { name: "Privacy", href: "/privacy" },
-        { name: "Terms", href: "/terms" },
+        { name: "About Us", href: "https://www.flytbase.com/about" },
+        { name: "Careers", href: "https://www.lifeatflytbase.com/" },
+        { name: "Privacy", href: "https://www.flytbase.com/privacy-policy" },
+        { name: "Terms", href: "https://www.flytbase.com/terms-of-use" },
       ],
     },
   ];
@@ -520,7 +520,7 @@ const Layout = ({ children }: LayoutProps) => {
                   <Link href="https://www.flytbase.com/webinars?utm_source=navbar&utm_medium=nav_webinar&utm_id=webinar_lead" className="block py-2 text-sm hover:text-primary" onClick={() => setIsMenuOpen(false)}>
                     Webinars
                   </Link>
-                  <Link href="/docs" className="block py-2 text-sm hover:text-primary" onClick={() => setIsMenuOpen(false)}>
+                  <Link href="https://docs.flytbase.com/" className="block py-2 text-sm hover:text-primary" >
                     Documentation
                   </Link>
                 </div>
@@ -634,7 +634,7 @@ const Layout = ({ children }: LayoutProps) => {
                   <Linkedin className="h-5 w-5" />
                 </a>
                 <a
-                  href="https://www.instagram.com/flytbase"
+                  href="https://www.instagram.com/flytbaselabs/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-primary transition-colors"
@@ -687,23 +687,23 @@ const Layout = ({ children }: LayoutProps) => {
 
             <div className="flex mt-4 md:mt-0 space-x-6">
               <a
-                href="/privacy"
+                href="https://www.flytbase.com/privacy-policy"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 Privacy Policy
               </a>
               <a
-                href="/terms"
+                href="https://www.flytbase.com/terms-of-use"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 Terms of Service
               </a>
-              <a
+              {/* <a
                 href="/cookies"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 Cookie Policy
-              </a>
+              </a> */}
             </div>
           </div>
         </div>

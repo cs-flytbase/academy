@@ -33,18 +33,28 @@ const FAQItem = ({
 }) => {
   return (
     <div className="border-b border-gray-800 py-8 last:border-b-0">
-      <div className="flex justify-between items-start">
+      <div 
+        className="flex justify-between items-start cursor-pointer" 
+        onClick={onToggle}
+        role="button"
+        tabIndex={0}
+        aria-expanded={isOpen}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onToggle();
+          }
+        }}
+      >
         <h3 className="text-xl md:text-2xl font-bold mb-4 text-white">
           {title}
         </h3>
-        <button
-          onClick={onToggle}
+        <div
           className="flex-shrink-0 mt-1 transform transition-transform duration-300 text-white"
           style={{ transform: isOpen ? "rotate(45deg)" : "rotate(0deg)" }}
-          aria-label={isOpen ? "Close section" : "Open section"}
         >
           <PlusIcon />
-        </button>
+        </div>
       </div>
 
       {isOpen && (

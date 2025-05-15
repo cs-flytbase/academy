@@ -1424,14 +1424,14 @@ const CourseDetail = () => {
                 </div>
 
                 {/* Next Video Component */}
-                {nextVideo && (
+                {/* {nextVideo && (
                   <NextVideoComponent
                     nextVideo={nextVideo}
                     onContinue={() => {
                       handleVideoSelect(currentVideoIndex + 1);
                     }}
                   />
-                )}
+                )} */}
               </motion.div>
             </div>
 
