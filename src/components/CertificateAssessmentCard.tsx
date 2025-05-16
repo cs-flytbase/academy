@@ -78,7 +78,7 @@ export function CertificateAssessmentCard({
   return (
     <div
       className={cn(
-        "relative w-full min-h-[330px] rounded-3xl transition-all duration-300 group",
+        "relative w-full min-h-[280px] md:min-h-[330px] rounded-3xl transition-all duration-300 group",
         isHovered ? "scale-[1.01] shadow-2xl" : "shadow-xl",
         className
       )}
@@ -104,50 +104,47 @@ export function CertificateAssessmentCard({
             }}
           />
           
-          {/* DECORATIVE TOP BAR */}
-          {/* <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#2C7BF2] to-transparent" /> */}
-          
-          <CardContent className="p-8 space-y-8 relative h-full flex flex-col justify-between">
+          <CardContent className="p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6 md:space-y-8 relative h-full flex flex-col justify-between">
             {/* TOP SECTION */}
-            <div className="space-y-6">
+            <div className="space-y-3 sm:space-y-4 md:space-y-6">
               {/* ICON + HEADINGS */}
-              <div className="flex items-start gap-5">
-                <div className="relative">
+              <div className="flex items-start gap-3 md:gap-5">
+                <div className="relative flex-shrink-0">
                   <div className="absolute inset-0 bg-gradient-to-br from-[#3a8dff] to-[#0E61DD] rounded-full blur-md opacity-70 animate-pulse-slow" />
-                  <div className="relative bg-gradient-to-br from-[#3a8dff] to-[#0E61DD] rounded-full p-4 shadow-lg">
-                    <Award className="h-8 w-8 text-white drop-shadow-md" />
+                  <div className="relative bg-gradient-to-br from-[#3a8dff] to-[#0E61DD] rounded-full p-3 md:p-4 shadow-lg">
+                    <Award className="h-6 w-6 md:h-8 md:w-8 text-white drop-shadow-md" />
                   </div>
                 </div>
                 
-                <div>
+                <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <div className="h-0.5 w-5 bg-gradient-to-r from-[#2C7BF2] to-[#0E61DD]" />
-                    <p className="tracking-wide text-xs font-bold uppercase bg-clip-text text-transparent bg-gradient-to-r from-[#3a8dff] to-[#0E61DD]">
+                    <p className="tracking-wide text-xs font-bold uppercase bg-clip-text text-transparent bg-gradient-to-r from-[#3a8dff] to-[#0E61DD] whitespace-nowrap">
                       Certificate Assessment
                     </p>
                   </div>
-                  <h3 className="mt-2 text-2xl font-bold leading-tight text-white">
+                  <h3 className="mt-1 sm:mt-2 text-lg sm:text-xl md:text-2xl font-bold leading-tight text-white line-clamp-2">
                     {courseTitle}
                   </h3>
                 </div>
               </div>
 
               {/* META LINE */}
-              <div className="flex flex-wrap items-center gap-4 text-sm">
-                <span className="flex items-center gap-2 bg-white/5 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/10">
-                  <FileText className="h-4 w-4 text-[#3a8dff]" /> 
-                  <span className="text-gray-200">{numQuestions} questions</span>
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <span className="flex items-center gap-1 bg-white/5 backdrop-blur-sm px-2 py-1 rounded-xl border border-white/10">
+                  <FileText className="h-3 w-3 text-[#3a8dff]" /> 
+                  <span className="text-gray-200 whitespace-nowrap">{numQuestions} questions</span>
                 </span>
                 
-                <span className="flex items-center gap-2 bg-white/5 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/10">
-                  <Clock className="h-4 w-4 text-[#3a8dff]" /> 
-                  <span className="text-gray-200">{duration}</span>
+                <span className="flex items-center gap-1 bg-white/5 backdrop-blur-sm px-2 py-1 rounded-xl border border-white/10">
+                  <Clock className="h-3 w-3 text-[#3a8dff]" /> 
+                  <span className="text-gray-200 whitespace-nowrap">{duration}</span>
                 </span>
                 
                 <span className={cn(
                   difficultyStyle.bgColor,
                   difficultyStyle.textColor,
-                  "flex items-center gap-2 px-4 py-2 rounded-xl font-medium border",
+                  "flex items-center gap-1 px-2 py-1 rounded-xl font-medium border text-xs",
                   difficultyStyle.borderColor
                 )}>
                   {difficulty}
@@ -156,22 +153,22 @@ export function CertificateAssessmentCard({
             </div>
             
             {/* CTA ROW */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-2">
+            <div className="flex gap-2 pt-2">
               <Button
                 variant="ghost"
                 onClick={onDetails}
-                className="flex-1 group/btn text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 hover:border-[#3a8dff]/50 transition-all duration-300"
+                className="flex-1 group/btn text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 hover:border-[#3a8dff]/50 transition-all duration-300 text-xs px-3 py-2.5 h-9"
               >
                 <span>View Details</span>
-                <ChevronRight className="ml-2 h-4 w-4 transform group-hover/btn:translate-x-1 transition-transform" />
+                <ChevronRight className="ml-1 h-3 w-3 transform group-hover/btn:translate-x-1 transition-transform" />
               </Button>
               
               <Button
                 onClick={onTakeTest}
                 className={cn(
-                  "flex-1 bg-gradient-to-br from-[#3a8dff] to-[#0E61DD] text-white font-bold text-base",
+                  "flex-1 bg-gradient-to-br from-[#3a8dff] to-[#0E61DD] text-white font-bold text-xs",
                   "shadow-lg shadow-blue-900/20 hover:shadow-blue-800/40",
-                  "border-0 rounded-xl overflow-hidden relative group/main",
+                  "border-0 rounded-xl overflow-hidden relative group/main px-3 py-2.5 h-9",
                   "transition-all duration-300 ease-out"
                 )}
               >
