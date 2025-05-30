@@ -380,6 +380,21 @@ const CourseDetail = () => {
         // We'll set currentVideoIndex after we have the progress data
         // Just set the default to the first video for now
         setCurrentVideo(data[0] || null);
+        
+        // Check if there's a hash in the URL to jump to a specific video
+        if (window.location.hash) {
+          const hash = window.location.hash.substring(1); // Remove the # character
+          const videoNumberMatch = hash.match(/video-(\d+)/);
+          
+          if (videoNumberMatch && videoNumberMatch[1]) {
+            const videoNumber = parseInt(videoNumberMatch[1], 10);
+            // Video numbers in the URL are 1-indexed, but our array is 0-indexed
+            if (videoNumber > 0 && videoNumber <= data.length) {
+              setCurrentVideoIndex(videoNumber - 1);
+              setCurrentVideo(data[videoNumber - 1] || null);
+            }
+          }
+        }
       }
       setLoading(false);
     };
@@ -398,6 +413,11 @@ const CourseDetail = () => {
       setQuizResults({ shown: false, score: 0, total: 0 });
       // Reset description expanded state
       setDescriptionExpanded(false);
+      
+      // Update URL with the video hash without triggering a navigation
+      const url = new URL(window.location.href);
+      url.hash = `video-${currentVideoIndex + 1}`;
+      window.history.replaceState({}, "", url.toString());
 
       // Fetch questions for the video immediately
       if (videos[currentVideoIndex]) {
@@ -656,6 +676,18 @@ const CourseDetail = () => {
   // Update your handleVideoSelect function to check completed status
   const handleVideoSelect = async (index: number) => {
     setCurrentVideoIndex(index);
+    
+    // Update URL hash when video is selected
+    const url = new URL(window.location.href);
+    url.hash = `video-${index + 1}`;
+    window.history.replaceState({}, "", url.toString());
+    
+    // Scroll to the video item in the list
+    const videoElement = document.getElementById(`video-${index + 1}`);
+    if (videoElement) {
+      videoElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
     const selectedVideo = videos[index];
 
     // Reset position until we fetch the correct one
@@ -1463,6 +1495,7 @@ const CourseDetail = () => {
 
                   return (
                     <div
+                      id={`video-${index + 1}`}
                       key={video.id}
                       onClick={() => handleVideoSelect(index)}
                       className={`
@@ -1484,6 +1517,21 @@ const CourseDetail = () => {
                       <div className="flex-1 min-w-0">
                         <p className={`font-medium text-sm truncate mb-1 ${isCurrent ? 'text-white' : 'text-gray-300'}`}>
                           {video.title}
+                          <a 
+                            href={`#video-${index + 1}`} 
+                            className="ml-2 text-xs text-[#2C7BF2] hover:underline cursor-pointer inline-flex items-center"
+                            title="Copy shareable link"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const url = new URL(window.location.href);
+                              url.hash = `video-${index + 1}`;
+                              navigator.clipboard.writeText(url.toString());
+                              // You could add a tooltip or notification here
+                            }}
+                          >
+                            <LinkIcon className="h-3 w-3 mr-1" />
+                            #{index + 1}
+                          </a>
                         </p>
                         <div className="flex items-center text-xs text-gray-400">
                           {isCompleted ? (

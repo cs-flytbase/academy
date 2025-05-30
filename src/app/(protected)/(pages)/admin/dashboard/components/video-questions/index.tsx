@@ -71,7 +71,7 @@ export default function VideoQuestionsTab() {
       const { data, error } = await supabase
         .from("courses")
         .select("*")
-        .order("title", { ascending: true });
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       setCourses(data || []);
@@ -91,7 +91,7 @@ export default function VideoQuestionsTab() {
         .from("videos")
         .select("*")
         .eq("course_id", courseId)
-        .order("title", { ascending: true });
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       setVideos(data || []);
@@ -113,7 +113,8 @@ export default function VideoQuestionsTab() {
       const { data: questionsData, error: questionsError } = await supabase
         .from("questions")
         .select("*")
-        .eq("video_id", selectedVideo);
+        .eq("video_id", selectedVideo)
+        .order("created_at", { ascending: false });
 
       if (questionsError) throw questionsError;
 
@@ -341,7 +342,8 @@ export default function VideoQuestionsTab() {
               questions={questions} 
               onEditQuestion={handleEditQuestion} 
               onDeleteQuestion={deleteQuestion} 
-              loading={loading} 
+              loading={loading}
+              onRefresh={fetchVideoQuestions}
             />
           </CardContent>
         </Card>
