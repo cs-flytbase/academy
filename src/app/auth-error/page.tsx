@@ -156,7 +156,7 @@ function AuthErrorContent() {
   );
 }
 
-// Main component with suspense boundary
+// Main component with suspense boundar
 export default function AuthErrorPage() {
   return (
     <Suspense fallback={<AuthErrorLoading />}>
