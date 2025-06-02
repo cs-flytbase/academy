@@ -53,6 +53,8 @@ export async function signup(formData: FormData) {
         full_name: `${firstName + " " + lastName}`,
         email: formData.get("email") as string,
       },
+      // Explicitly enable email confirmation
+      emailRedirectTo: `${getURL()}/auth/callback`,
     },
   };
 
@@ -62,8 +64,9 @@ export async function signup(formData: FormData) {
     redirect("/error");
   }
 
-  revalidatePath("/", "layout");
-  redirect("/");
+  // Redirect to email verification page instead of home
+  revalidatePath("/verify-email", "layout");
+  redirect("/verify-email");
 }
 
 export async function signout() {
