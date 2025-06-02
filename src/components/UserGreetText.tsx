@@ -116,8 +116,8 @@ const UserGreetText = () => {
 
   // If user is not logged in, show Get Started button
   return (
-    <div onClick={() => router.push("/signup")} className="cursor-pointer">
-      <NavButton href="/signup">
+    <div onClick={() => router.push("/login")} className="cursor-pointer">
+      <NavButton href="/login">
         <span className="text-sm font-medium">GET STARTED</span>
       </NavButton>
     </div>
