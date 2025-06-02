@@ -6,8 +6,28 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Mail, AlertTriangle, AlertCircle, ArrowRight } from "lucide-react";
+import { Suspense } from "react";
 
-export default function AuthErrorPage() {
+// Loading fallback component
+function AuthErrorLoading() {
+  return (
+    <div className="h-screen w-full flex items-center justify-center p-4 bg-background">
+      <Card className="max-w-md w-full">
+        <CardHeader className="text-center">
+          <div className="flex justify-center pb-4">
+            <div className="w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+              <AlertCircle className="h-8 w-8 text-amber-600 dark:text-amber-500" />
+            </div>
+          </div>
+          <CardTitle className="text-2xl">Loading...</CardTitle>
+        </CardHeader>
+      </Card>
+    </div>
+  );
+}
+
+// Main content component using client hooks
+function AuthErrorContent() {
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
   const email = searchParams.get("email") || "";
@@ -133,5 +153,14 @@ export default function AuthErrorPage() {
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+// Main component with suspense boundary
+export default function AuthErrorPage() {
+  return (
+    <Suspense fallback={<AuthErrorLoading />}>
+      <AuthErrorContent />
+    </Suspense>
   );
 }
