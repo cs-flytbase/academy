@@ -280,9 +280,9 @@ const UserPage = () => {
     );
 
   return (
-    <div className="bg-black min-h-screen w-full max-w-full overflow-x-hidden">
+    <div className="bg-black min-h-screen w-full max-w-full overflow-x-hidden ">
       {/* Dark Coursera-Style Header */}
-      <div className="flex flex-col gap-4 px-3 md:flex-row md:items-center md:justify-between md:px-6 lg:px-20 pt-6 pb-4">
+      <div className="flex flex-col gap-4 px-3 md:flex-row md:items-center md:justify-between md:px-6 lg:px-20 pt-6 pb-4 my-5">
         <div className="max-w-full">
           <h1 className="text-xl md:text-3xl lg:text-4xl font-bold text-white truncate">Courses</h1>
           <p className="text-xs md:text-base text-gray-400 mt-1">Browse our catalog of top courses and start learning today.</p>
@@ -304,7 +304,7 @@ const UserPage = () => {
       
       {/* Courses Grid */}
       <div className="w-full px-3 md:px-6 lg:px-20 pb-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-[1rem]">
           {filteredCourses.map((course) => (
             <Link
               key={course.id}
