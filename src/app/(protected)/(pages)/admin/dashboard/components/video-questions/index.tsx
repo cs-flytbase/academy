@@ -29,7 +29,7 @@ export default function VideoQuestionsTab() {
   // Default question form
   const [questionForm, setQuestionForm] = useState<any>({
     question_text: "",
-    description: "",
+    // description: "",
     question_type: "multiple-choice",
     difficulty: "medium",
     options: [
@@ -160,7 +160,7 @@ export default function VideoQuestionsTab() {
 
     setQuestionForm({
       question_text: "",
-      description: "",
+      // description: "",
       question_type: "multiple-choice",
       difficulty: "medium",
       options: [
@@ -180,7 +180,7 @@ export default function VideoQuestionsTab() {
     setQuestionForm({
       id: question.id,
       question_text: question.question_text,
-      description: question.description || "",
+      // description: question.description || "",
       question_type: question.question_type,
       difficulty: question.difficulty,
       video_id: question.video_id,

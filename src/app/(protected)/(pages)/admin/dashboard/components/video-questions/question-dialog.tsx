@@ -171,7 +171,7 @@ const QuestionDialog: React.FC<QuestionDialogProps> = ({
           .from("questions")
           .insert({
             question_text: questionForm.question_text,
-            description: questionForm.description || null,
+            // description field removed as it doesn't exist in the schema
             question_type: questionForm.question_type,
             difficulty: questionForm.difficulty || null,
             video_id: selectedVideo ? parseInt(selectedVideo) : null,
