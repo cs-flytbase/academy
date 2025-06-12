@@ -276,86 +276,125 @@ const VideoLandingPage = () => {
             </div>
 
             {/* Three cards grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Card 1 */}
-              <div className="bg-[#1a1a1a] p-8 rounded-lg border border-gray-800">
-                <div className="w-12 h-12 bg-[#232323] rounded-full flex items-center justify-center mb-6">
-                  <svg
-                    className="w-6 h-6 text-gray-300"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Card 1 - Flexible Learning */}
+              <div className="bg-[#1a1a1a] p-8 rounded-xl border border-gray-800 shadow-lg hover:shadow-primary/20 transition-all duration-300 transform hover:-translate-y-1 group relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all duration-500 -mr-16 -mt-16"></div>
+                <div className="w-14 h-14 bg-gradient-to-br from-primary/30 to-primary/5 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <svg 
+                    className="w-7 h-7 text-primary" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <path
-                      strokeLinecap="round"
+                    <path 
+                      d="M12 6V9M12 15.75V18.75M17.25 12H20.25M3.75 12H6.75M15.75 8.25L17.25 6.75M6.75 17.25L8.25 15.75M8.25 8.25L6.75 6.75M17.25 17.25L15.75 15.75M12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12C15 13.6569 13.6569 15 12 15Z" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
                       strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold mb-4">Flexible Learning</h3>
-                <p className="text-gray-400">
+                <h3 className="text-2xl font-bold mb-3 text-white group-hover:text-primary transition-colors duration-300">Flexible Learning</h3>
+                <p className="text-gray-300 leading-relaxed mb-6">
                   Master autonomous drone operations at your own pace with our
-                  remote and self-paced training programs.
+                  remote and self-paced training programs designed to fit your schedule.
                 </p>
+                <div className="flex items-center text-primary/70 group-hover:text-primary transition-colors duration-300">
+                  <span className="text-sm font-medium">Learn more</span>
+                  <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform duration-300" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3.33337 8H12.6667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M8 3.33331L12.6667 7.99998L8 12.6666" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
               </div>
 
-              {/* Card 2 */}
-              <div className="bg-[#1a1a1a] p-8 rounded-lg border border-gray-800">
-                <div className="w-12 h-12 bg-[#232323] rounded-full flex items-center justify-center mb-6">
-                  <svg
-                    className="w-6 h-6 text-gray-300"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+              {/* Card 2 - Comprehensive Curriculum */}
+              <div className="bg-[#1a1a1a] p-8 rounded-xl border border-gray-800 shadow-lg hover:shadow-primary/20 transition-all duration-300 transform hover:-translate-y-1 group relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all duration-500 -mr-16 -mt-16"></div>
+                <div className="w-14 h-14 bg-gradient-to-br from-primary/30 to-primary/5 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <svg 
+                    className="w-7 h-7 text-primary" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <path
-                      strokeLinecap="round"
+                    <path 
+                      d="M12 14L12 6M12 14L9 11M12 14L15 11M5 17.5V21H19V17.5" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
                       strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                    <path 
+                      d="M5 13C5 13.5523 5.44772 14 6 14H8C8.55228 14 9 13.5523 9 13V10C9 9.44772 8.55228 9 8 9H6C5.44772 9 5 9.44772 5 10V13Z" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                    />
+                    <path 
+                      d="M15 13C15 13.5523 15.4477 14 16 14H18C18.5523 14 19 13.5523 19 13V6C19 5.44772 18.5523 5 18 5H16C15.4477 5 15 5.44772 15 6V13Z" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold mb-4">
-                  Comprehensive Curriculum
-                </h3>
-                <p className="text-gray-400">
+                <h3 className="text-2xl font-bold mb-3 text-white group-hover:text-primary transition-colors duration-300">Comprehensive Curriculum</h3>
+                <p className="text-gray-300 leading-relaxed mb-6">
                   Explore autonomous drone technology through our tailor-made
-                  courses. Covering all industry aspects from foundation to
-                  advanced levels, we ensure learners at any stage gain
-                  comprehensive skills and insights.
+                  courses spanning all industry aspects from foundation to advanced levels.
                 </p>
+                <div className="flex items-center text-primary/70 group-hover:text-primary transition-colors duration-300">
+                  <span className="text-sm font-medium">Learn more</span>
+                  <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform duration-300" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3.33337 8H12.6667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M8 3.33331L12.6667 7.99998L8 12.6666" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
               </div>
 
-              {/* Card 3 */}
-              <div className="bg-[#1a1a1a] p-8 rounded-lg border border-gray-800">
-                <div className="w-12 h-12 bg-[#232323] rounded-full flex items-center justify-center mb-6">
-                  <svg
-                    className="w-6 h-6 text-gray-300"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+              {/* Card 3 - Industry-Expert Led */}
+              <div className="bg-[#1a1a1a] p-8 rounded-xl border border-gray-800 shadow-lg hover:shadow-primary/20 transition-all duration-300 transform hover:-translate-y-1 group relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all duration-500 -mr-16 -mt-16"></div>
+                <div className="w-14 h-14 bg-gradient-to-br from-primary/30 to-primary/5 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <svg 
+                    className="w-7 h-7 text-primary" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <path
-                      strokeLinecap="round"
+                    <path 
+                      d="M15.5 7.5C15.5 9.433 13.933 11 12 11C10.067 11 8.5 9.433 8.5 7.5C8.5 5.567 10.067 4 12 4C13.933 4 15.5 5.567 15.5 7.5Z" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
                       strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                    <path 
+                      d="M5 19.5C5 15.9101 8.13401 13 12 13C15.866 13 19 15.9101 19 19.5V20H5V19.5Z" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold mb-4">Industry-Expert Led</h3>
-                <p className="text-gray-400">
+                <h3 className="text-2xl font-bold mb-3 text-white group-hover:text-primary transition-colors duration-300">Industry-Expert Led</h3>
+                <p className="text-gray-300 leading-relaxed mb-6">
                   Learn directly from industry leaders at the forefront of
-                  autonomous drone operations. Our courses are led by experts
-                  actively shaping enterprise solutions across diverse
-                  applications.
+                  autonomous drone operations shaping enterprise solutions across sectors.
                 </p>
+                <div className="flex items-center text-primary/70 group-hover:text-primary transition-colors duration-300">
+                  <span className="text-sm font-medium">Learn more</span>
+                  <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform duration-300" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3.33337 8H12.6667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M8 3.33331L12.6667 7.99998L8 12.6666" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
